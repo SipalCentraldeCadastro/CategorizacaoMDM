@@ -1,0 +1,1415 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Categorizador MDM 302 - Materiais Indiretos</title>
+<style>
+:root{
+ --bg:#f5f7fa; --card:#ffffff; --ink:#1c2330; --mut:#68748a; --line:#e3e8f0;
+ --brand:#1e5aa8; --brand2:#2b7cd3; --ok:#1a7f4b; --warn:#b06d00; --risk:#c0392b;
+ --shadow:0 1px 2px rgba(16,24,40,.06),0 4px 14px rgba(16,24,40,.06);
+ --r:12px;
+}
+*{box-sizing:border-box}
+body{margin:0;font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+header{background:linear-gradient(120deg,#12376b,#1e5aa8 55%,#2b7cd3);color:#fff;padding:16px 22px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+header h1{font-size:17px;margin:0;font-weight:600;letter-spacing:.2px}
+header .sub{font-size:12px;opacity:.85}
+header .grow{flex:1}
+.pill{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.25);padding:5px 10px;border-radius:99px;font-size:12px;display:inline-flex;gap:6px;align-items:center}
+.dot{width:8px;height:8px;border-radius:50%;background:#8fe0a8;display:inline-block}
+.dot.off{background:#ffc9c9}
+nav{display:flex;gap:4px;padding:0 16px;background:#fff;border-bottom:1px solid var(--line);overflow-x:auto;position:sticky;top:0;z-index:5}
+nav button{background:none;border:0;padding:13px 14px;font-size:13.5px;color:var(--mut);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap}
+nav button.on{color:var(--brand);border-bottom-color:var(--brand);font-weight:600}
+main{padding:18px;max-width:1440px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:16px;margin-bottom:16px}
+.card h2{margin:0 0 4px;font-size:15px}
+.card p.hint{margin:0 0 12px;color:var(--mut);font-size:12.5px}
+label{display:block;font-size:12px;color:var(--mut);margin:10px 0 4px;font-weight:600;letter-spacing:.2px}
+input[type=text],input[type=password],textarea,select{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:9px;font:inherit;background:#fcfdff}
+textarea{min-height:130px;resize:vertical;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px}
+input:focus,textarea:focus,select:focus{outline:2px solid #cfe0f7;border-color:var(--brand2)}
+.btn{display:inline-flex;align-items:center;gap:7px;background:var(--brand);color:#fff;border:0;padding:10px 16px;border-radius:9px;font:600 13px/1 inherit;cursor:pointer;transition:.15s}
+.btn:hover{background:#17457f;transform:translateY(-1px)}
+.btn.sec{background:#fff;color:var(--brand);border:1px solid #c6d7ee}
+.btn.sec:hover{background:#f0f6ff}
+.btn.gho{background:#eef2f7;color:var(--ink)}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px}
+.grid{display:grid;gap:14px}
+.g3{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:13px 15px;box-shadow:var(--shadow)}
+.kpi b{display:block;font-size:22px;line-height:1.2}
+.kpi span{font-size:11.5px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px}
+.tw{overflow:auto;border:1px solid var(--line);border-radius:var(--r);background:#fff;max-height:66vh}
+table{border-collapse:collapse;width:100%;font-size:12.5px}
+th{background:#f2f6fb;text-align:left;padding:9px 10px;position:sticky;top:0;font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:#4a5568;border-bottom:1px solid var(--line);z-index:2}
+td{padding:8px 10px;border-bottom:1px solid #f0f3f8;vertical-align:top}
+tr:hover td{background:#fafcff}
+tr.flag td{background:#fff8ec}
+tr.flag:hover td{background:#fff3de}
+tr.dup td{background:#fdf0ee}
+.code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-weight:600}
+.tip{border-bottom:1px dotted #9fb3cc;cursor:help}
+.tag{display:inline-block;padding:2px 7px;border-radius:99px;font-size:11px;font-weight:600;white-space:nowrap}
+.tag.ok{background:#e6f6ec;color:var(--ok)}
+.tag.wa{background:#fdf3e0;color:var(--warn)}
+.tag.ri{background:#fdeceb;color:var(--risk)}
+.tag.n{background:#eef2f7;color:var(--mut)}
+.bar{height:6px;background:#eef2f7;border-radius:99px;overflow:hidden;min-width:52px}
+.bar i{display:block;height:100%;background:var(--brand2)}
+.sk{height:13px;border-radius:6px;background:linear-gradient(90deg,#eef2f7 25%,#e2e8f0 37%,#eef2f7 63%);background-size:400% 100%;animation:sh 1.2s infinite}
+@keyframes sh{0%{background-position:100% 0}100%{background-position:0 0}}
+.note{background:#f7faff;border:1px solid #dbe7f7;border-left:3px solid var(--brand2);padding:10px 12px;border-radius:8px;font-size:12.5px;color:#33465e}
+.note.wa{background:#fffaf0;border-color:#f0dfc0;border-left-color:var(--warn)}
+details.help{margin-top:10px}
+details.help summary{cursor:pointer;color:var(--mut);font-size:12.5px;list-style:none}
+details.help summary::-webkit-details-marker{display:none}
+.drop{border:2px dashed #c6d7ee;border-radius:var(--r);padding:26px;text-align:center;color:var(--mut);background:#fbfdff;cursor:pointer}
+.drop.hot{background:#eef6ff;border-color:var(--brand2);color:var(--brand)}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}
+.hidden{display:none!important}
+.right{margin-left:auto}
+.chk{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--mut);font-weight:600}
+.chk input{width:auto;margin:0}
+footer{padding:8px 20px 28px;color:var(--mut);font-size:11.5px;text-align:center}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(20px);background:#12233b;color:#fff;padding:11px 18px;border-radius:99px;font-size:13px;opacity:0;transition:.25s;z-index:99;box-shadow:0 8px 24px rgba(0,0,0,.2)}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+/* ===== passos, campos de resultado e responsividade ===== */
+.step{position:relative;padding-left:56px}
+.stepnum{position:absolute;left:16px;top:18px;width:28px;height:28px;border-radius:50%;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}
+.step h2{margin-top:2px}
+.entry{display:flex;gap:10px;align-items:stretch;flex-wrap:wrap}
+.entry input{flex:1;min-width:240px;font-size:17px;padding:15px 16px;font-weight:600}
+.btn.big{font-size:16px;padding:15px 26px}
+.orline{display:flex;align-items:center;gap:12px;color:var(--mut);font-size:12.5px;margin:16px 0 10px;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+.orline:before,.orline:after{content:"";height:1px;background:var(--line);flex:1}
+.fldgrid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.fld{border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;background:#fbfdff;display:flex;flex-direction:column;gap:3px;min-height:104px}
+.fld .fl{font-size:10.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--mut);font-weight:700}
+.fld .fc{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:24px;font-weight:700;color:var(--brand);line-height:1.15;word-break:break-all}
+.fld .fd{font-size:12px;color:#46525f;line-height:1.35}
+.fld .fx{margin-top:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.fld .cf{font-size:11.5px;font-weight:700}
+.fld .cf.ok{color:var(--ok)}.fld .cf.wa{color:var(--warn)}.fld .cf.ri{color:var(--risk)}
+.fld.fix{background:#f6f8fc}
+.fld select{font-size:13px;padding:8px 10px;margin:0}
+.fedit{padding:4px 9px;font-size:11.5px}
+.gconf{display:flex;align-items:center;gap:14px;flex-wrap:wrap;border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;background:#fff}
+.gconf .gv{font-size:30px;font-weight:800;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.gconf .gv.ok{color:var(--ok)}.gconf .gv.wa{color:var(--warn)}.gconf .gv.ri{color:var(--risk)}
+.gconf .gb{flex:1;min-width:160px}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:11.5px;color:var(--mut)}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}
+.empty{border:1px dashed var(--line);border-radius:var(--r);padding:26px;text-align:center;color:var(--mut);background:#fbfdff}
+table td .cd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-weight:700;color:var(--brand);font-size:13.5px}
+table td .cx{font-size:11px;color:var(--mut);display:block;margin-top:2px;line-height:1.3}
+details{border:1px solid var(--line);border-radius:var(--r);background:#fbfdff;padding:0}
+details>summary{cursor:pointer;padding:11px 14px;font-size:12.5px;font-weight:600;color:var(--brand);list-style:none}
+details>summary::-webkit-details-marker{display:none}
+details>summary:before{content:"\24D8  "}
+details>div,details>textarea{margin:0 14px 14px}
+details[open]>summary{border-bottom:1px solid var(--line);margin-bottom:12px}
+@media (max-width:760px){
+ header{padding:12px 14px}
+ main{padding:12px}
+ .card{padding:14px}
+ .step{padding-left:14px;padding-top:44px}
+ .stepnum{left:14px;top:12px}
+ .entry input{font-size:16px}
+ .btn,.btn.big{width:100%;justify-content:center}
+ .row{flex-direction:column;align-items:stretch}
+ .row .right{margin-left:0}
+ .fld .fc{font-size:21px}
+ nav{overflow-x:auto;white-space:nowrap}
+}
+</style>
+</head>
+<body>
+<header>
+ <div>
+  <h1>Categorizador MDM &middot; Fluxo 302 Materiais Indiretos</h1>
+  <div class="sub">1 digite o material &middot; 2 confira codigo e descricao de cada campo &middot; 3 exporte no layout do cadastro em massa</div>
+ </div>
+ <div class="grow"></div>
+ <span class="pill" id="baseState"><span class="dot off" id="baseDot"></span><span id="baseTxt">base nao carregada</span></span>
+</header>
+
+<nav>
+ <button class="on" data-t="analise">Analisar e exportar</button>
+ <button data-t="base">Base e administracao</button>
+ <button data-t="log">Log de decisoes</button>
+ <button data-t="regras">Regras e catalogos</button>
+</nav>
+
+<main>
+
+<section id="t-analise">
+
+ <div class="card step">
+  <div class="stepnum">1</div>
+  <h2>Entrada</h2>
+  <p class="hint">Digite o nome do material como ele deve ficar cadastrado. Para varios materiais de uma vez, envie a planilha ou cole a lista.</p>
+  <div class="entry">
+   <input id="u1" placeholder="Digite o nome do material  -  ex.: ROLAMENTO AUT RL 22210E">
+   <button class="btn big" id="bUnico">Analisar material</button>
+  </div>
+  <div class="row" style="margin-top:8px">
+   <button class="btn gho" id="bExemplo">preencher com um exemplo</button>
+   <span class="hint">a tecla Enter tambem analisa</span>
+  </div>
+
+  <details style="margin-top:12px">
+   <summary>informar tambem Descricao Curta e Descricao Longa (opcional)</summary>
+   <div class="grid g2">
+    <div><label>Descricao Curta Saneada</label><input id="u2" placeholder="opcional"></div>
+    <div><label>Descricao Longa Padronizada</label><textarea id="u3" placeholder="opcional" style="height:90px"></textarea></div>
+   </div>
+  </details>
+
+  <div class="orline">ou processe em lote</div>
+  <div class="grid g2">
+   <div>
+    <div class="drop" id="drop">Clique ou arraste a planilha XLSX / CSV<div class="mono" id="dropInfo" style="margin-top:6px">nenhum arquivo selecionado</div></div>
+    <input type="file" id="file" class="hidden" accept=".xlsx,.csv,.txt">
+    <button class="btn sec" id="bUp" disabled style="margin-top:10px">Analisar planilha</button>
+   </div>
+   <div>
+    <label>Colar lista - um material por linha</label>
+    <textarea id="loteIn" placeholder="PARAFUSO SXT UNC 1/2X2POL ACO ZINCADO&#10;OLEO HIDRAULICO 68 BALDE 20L&#10;LUVA SEGURANCA VAQUETA TAM G" style="height:110px"></textarea>
+    <button class="btn sec" id="bLote" style="margin-top:8px">Analisar lista</button>
+   </div>
+  </div>
+
+  <details style="margin-top:12px">
+   <summary>como a ferramenta decide</summary>
+   <div class="hint">A sugestao vem do padrao real da base 302 (24.344 materiais): substantivo principal da descricao, termos modificadores, materiais semelhantes ja cadastrados e suas proprias correcoes anteriores. Grupo Categoria Item e Setor de Atividade sao padroes fixos do fluxo (NORM e 80) e ficam pre-preenchidos. A ferramenta sugere; a decisao final e sempre sua.</div>
+  </details>
+ </div>
+
+ <div class="card step" id="stepRes">
+  <div class="stepnum">2</div>
+  <h2>Resultado</h2>
+  <div class="row">
+   <div class="legend">
+    <span><i style="background:#1a7f4b"></i>confianca 80% ou mais</span>
+    <span><i style="background:#9a6b00"></i>60% a 79%</span>
+    <span><i style="background:#b3261e"></i>abaixo de 60%</span>
+   </div>
+   <div class="right"></div>
+   <label class="chk"><input type="checkbox" id="onlyEx"> mostrar somente itens que pedem revisao</label>
+  </div>
+  <div id="out"><div class="empty">Nenhum material analisado ainda. Comece pelo passo 1.</div></div>
+ </div>
+
+ <div class="card step" id="stepAct">
+  <div class="stepnum">3</div>
+  <h2>Acao</h2>
+  <p class="hint">Saida no layout exato do modelo de cadastro em massa: Descricao do material &middot; Tipo de material &middot; Grupo de Mercadorias &middot; Grupo de compradores &middot; Grupo categoria Item &middot; Setor de atividade &middot; Cadastro aprovado?</p>
+  <div class="row">
+   <button class="btn" id="bXlsModelo">Baixar XLSX do cadastro em massa</button>
+   <button class="btn sec" id="bCsvModelo">Baixar CSV</button>
+   <button class="btn sec" id="bCopy">Copiar bloco para o 4MDG</button>
+   <button class="btn gho" id="bXlsFull">Baixar analise completa (com alertas)</button>
+  </div>
+  <div class="row"><label class="chk"><input type="checkbox" id="skipEx"> nao exportar itens com alerta de revisao</label>
+   <div class="right"></div>
+   <button class="btn gho" id="bAudit">verificar se a exportacao tem somente codigos</button></div>
+  <div id="auditOut"></div>
+  <details style="margin-top:6px">
+   <summary>previa do bloco copiavel</summary>
+   <textarea id="tsv" class="mono" readonly style="height:150px"></textarea>
+  </details>
+ </div>
+
+</section>
+
+<section id="t-base" class="hidden">
+ <div class="card">
+  <h2>Base de materiais existentes no SAP</h2>
+  <p class="hint">Usada para detectar duplicidade e para aprender o padrao real de categorizacao. Fica salva no navegador e carrega sozinha na proxima abertura.</p>
+  <div class="grid g3" id="baseKpis"></div>
+  <div class="row">
+   <button class="btn sec" id="bBaseFile">Selecionar arquivo da base (XLSX/CSV)</button>
+   <input type="file" id="baseFile" class="hidden" accept=".xlsx,.csv,.txt">
+   <span class="mono" id="baseFileInfo"></span>
+  </div>
+  <div class="row">
+   <label class="chk"><input type="checkbox" id="baseAppend"> acrescentar a base atual em vez de substituir</label>
+  </div>
+  <div class="note wa" style="margin-top:12px">Substituir a base nao apaga suas correcoes aprendidas nem o log de decisoes.</div>
+ </div>
+ <div class="card">
+  <h2>Area administrativa</h2>
+  <p class="hint">Manutencao da base, do aprendizado e do log.</p>
+  <div id="admLock">
+   <label>Senha do administrador</label>
+   <div class="row"><input type="password" id="admPwd" style="max-width:260px" placeholder="senha"><button class="btn" id="bAdm">Entrar</button></div>
+  </div>
+  <div id="admArea" class="hidden">
+   <div class="row">
+    <button class="btn sec" id="bRelearn">Reconstruir aprendizado da base</button>
+    <button class="btn sec" id="bExpBase">Exportar base (CSV)</button>
+    <button class="btn sec" id="bExpFb">Exportar correcoes (CSV)</button>
+    <button class="btn gho" id="bClrBase">Limpar base</button>
+    <button class="btn gho" id="bChgPwd">Trocar senha</button>
+   </div>
+   <div class="note" style="margin-top:12px" id="admInfo"></div>
+  </div>
+ </div>
+</section>
+
+<section id="t-log" class="hidden">
+ <div class="card">
+  <h2>Log de decisoes</h2>
+  <p class="hint">Toda analise e toda correcao sua ficam registradas. As correcoes voltam como reforco nas proximas classificacoes.</p>
+  <div class="row">
+   <button class="btn sec" id="bExpLog">Exportar log (CSV)</button>
+   <button class="btn gho" id="bClrLog">Limpar log</button>
+  </div>
+  <div class="tw" style="margin-top:12px"><table id="logTb"><thead><tr><th>Quando</th><th>Descricao</th><th>Tipo</th><th>GM</th><th>GC</th><th>Conf.</th><th>Origem</th><th>Evento</th></tr></thead><tbody></tbody></table></div>
+ </div>
+</section>
+
+<section id="t-regras" class="hidden">
+ <div class="card">
+  <h2>Tipos de material permitidos no Fluxo 302</h2>
+  <div class="tw"><table id="tbTipos"><thead><tr><th>Codigo</th><th>Tipo</th><th>Uso</th></tr></thead><tbody></tbody></table></div>
+  <div class="note wa" style="margin-top:12px">ZATI (Imobilizado) pertence ao Fluxo 304 e nunca e sugerido como resultado: aparece apenas como alerta de validacao.</div>
+ </div>
+ <div class="card">
+  <h2>Regra de Imobilizado embarcada</h2>
+  <div id="regraImob"></div>
+ </div>
+ <div class="card">
+  <h2>Catalogos de codigos</h2>
+  <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(320px,1fr))">
+   <div><label>Grupo de Mercadoria</label><div class="tw" style="max-height:320px"><table id="tbGm"><thead><tr><th>Codigo</th><th>Descricao</th></tr></thead><tbody></tbody></table></div></div>
+   <div><label>Grupo de Compradores</label><div class="tw" style="max-height:320px"><table id="tbGc"><thead><tr><th>Codigo</th><th>Descricao</th></tr></thead><tbody></tbody></table></div></div>
+  </div>
+ </div>
+</section>
+
+</main>
+<footer>Ferramenta interna do time de Cadastro de Materiais &middot; a IA sugere, a decisao final e sempre sua</footer>
+<div class="toast" id="toast"></div>
+<script>
+/* ================= CATALOGOS E REGRAS EMBARCADAS ================= */
+const TIPOS = [
+ ["ERSA","Peca de Reposicao","Componentes para manutencao e reparo de maquinas e equipamentos (rolamentos, motores, correias, sensores)"],
+ ["HIBE","Material Auxiliar ou de Consumo","Uso no dia a dia da operacao e manutencao (lubrificantes, produtos de limpeza, EPIs, material de escritorio)"],
+ ["NLAG","Material Nao Estocavel","Itens nao estocaveis, nao palpaveis ou sucata"]
+];
+const GM = {
+"14001":"PREPARADOS P/ANIMAIS","24001":"EMBALAGENS","24002":"EMBAL PROLIPROPILENO","29001":"BIOCOMBUSTIVEIS","29002":"COMBUSTIVEIS FOSSEIS","29003":"COMBUSTIVEL LENHOSO",
+"80001":"IMOB ELETRONICO","80002":"IMOB IMOVEIS","80003":"IMOB MAQUINAS","80004":"IMOB SOFTWARE","80005":"IMOB VEICULOS","80006":"IMOB MOBILIARIO",
+"90001":"MANUT EQUIPAMENTOS","90002":"MANUT MAQUINAS","90003":"MANUT VEICULOS","90004":"MANUT IMOVEIS","90101":"INSTALACAO","90151":"CONSTRUCAO",
+"90701":"FERRAMENTA/UTENSILIO","90702":"UTENSILIO/COPA-COZINHA","90703":"ALIMENTACAO","90704":"MOVEIS/UTENSILIOS","90705":"LIMPEZA","90706":"LABORATORIO",
+"90707":"EXPEDIENTE","90708":"OLEOS/LUBRIFICANTES","90709":"INFORMATICA","90710":"UNIFORMES","90711":"EPI'S","90712":"EVENTOS/CONFRATERNIZ"
+};
+const GM_IMOB = ["80001","80002","80003","80004","80005","80006"];
+const GC = {
+"AL1":"ALIMENTACAO","AU1":"UTENSILIOS/COPA","CO1":"COMBUSTIVEIS","CO2":"COMBUSTIVEIS PARA","EP1":"EPI","EQ1":"EQUIPAMENTOS - IND","EV1":"EVENTOS","G01":"GRAOS",
+"IA1":"ITENS ADMINISTRATIVOS","I02":"MERCADORIAS - IMPORTACAO","IM1":"IMPORTACAO GRAOS","IN1":"INSUMOS (REVENDA)","IP1":"IMPLEMENTOS","IP2":"INSUMOS PECUARIOS",
+"IS1":"INFORMATICA/SISTEMAS","LB1":"LUBRIFICANTES","LB2":"LABORATORIO - MATERIAIS","LC1":"LENHA / CAVACO","MC1":"MATERIAIS PARA CONSTRUCAO","ME1":"MATERIAIS ELETRICOS",
+"ME2":"MEDICAMENTOS","MG3":"MATERIAL DE HIGIENE","ML1":"MATERIAIS DE LIMPEZA","MQ1":"MAQUINAS/PECAS","MR1":"MANUTENCAO E REPOSICAO","MU1":"MOVEIS E UTENSILIOS",
+"OP1":"OBRAS E PROJETOS","PH1":"PASSAGENS / HOSPEDAGEM","PQ1":"PRODUTOS QUIMICOS","SE3":"SEGURO PATRIMONIAL","SH1":"SUPRIMENTOS HARDWARE","SL1":"SERVICOS LOGISTICOS",
+"SL3":"SERVICOS LOCACAO","SV4":"SERVICOS DE VIGILANCIA","UF1":"UNIFORMES","VM1":"VACINAS E MEDICAMENTOS"
+};
+const FIXOS = {gci:"NORM", gciNlag:"NLAG", setor:"80", aprovado:"APROVADO"};
+const COLS4MDG = ["Descrição do material","Tipo de material","Grupo de Mercadorias","Grupo de compradores","Grupo categoria Item","Setor de atividade","Cadastro aprovado?"];
+/* codigos presentes no historico da base 302 que nao constam nos catalogos oficiais 663/627 */
+const FORA663 = ["90702","90703","90704","90706","90710"];
+const FORA627 = ["MR1","AL1","AU1","IA1","MQ1","EP1","ME2","IS1","LB1","OP1","SH1","SG5","F01","IF1","II2","TI1"];
+const GCI_OPC = ["NORM","NLAG"];
+/* ================= CODIGO PURO (regra central: campo classificado guarda SEMPRE o codigo) =================
+   qualquer valor que chegue como "90701 - FERRAMENTA/UTENSILIO" (planilha do 4MDG, base carregada,
+   colagem manual) e reduzido ao codigo antes de entrar no motor, na tela e na exportacao */
+function codeOf(f,v){
+ if(v===undefined||v===null) return "";
+ let s=String(v).replace(/\u00a0/g," ").trim().replace(/^["']+|["']+$/g,"");
+ if(!s) return "";
+ const U=s.toUpperCase();
+ if(f==="setor"){ const m=U.match(/\d{1,3}/); return m?m[0]:"" }
+ if(f==="gm"){ const m=U.match(/\b\d{5,6}\b/); return m?m[0]:U.split(/[\s\-\u2013\u2014:|;,\/]+/)[0] }
+ if(f==="tm"){ for(let i=0;i<TIPOS.length;i++){ if(new RegExp("(^|[^A-Z])"+TIPOS[i][0]+"([^A-Z]|$)").test(U)) return TIPOS[i][0] } return U.split(/[\s\-\u2013\u2014:|;,\/]+/)[0] }
+ if(f==="gci"){ if(/NLAG/.test(U)) return "NLAG"; if(/NORM/.test(U)) return "NORM"; return U.split(/[\s\-\u2013\u2014:|;,\/]+/)[0] }
+ if(f==="gc"){ const m=U.match(/\b[A-Z]{1,3}[0-9]{1,2}\b/); return m?m[0]:U.split(/[\s\-\u2013\u2014:|;,\/]+/)[0] }
+ if(f==="aprovado"){ return U.split(/[\s\-\u2013\u2014:|;,\/]+/)[0] }
+ return s;
+}
+function codeSafe(f,v){ const c=codeOf(f,v); return codeOk(f,c)?c:"" }
+function codeOk(f,c){
+ if(!c) return false;
+ if(f==="tm") return TIPOS.some(function(t){return t[0]===c});
+ if(f==="gm") return /^\d{5,6}$/.test(c);
+ if(f==="gc") return /^[A-Z]{1,3}[0-9]{1,2}$/.test(c);
+ if(f==="gci") return GCI_OPC.indexOf(c)>=0;
+ if(f==="setor") return /^\d{1,3}$/.test(c);
+ if(f==="aprovado") return /^[A-Z]+$/.test(c);
+ return true;
+}
+/* fonte do codigo, so para o painel de transparencia (nunca exportado) */
+const CAT_SRC = { tm:"catalogo 650 - Materiais Indiretos", gm:"catalogo 663 - Grupo de Mercadoria - 302",
+                  gc:"catalogo 627 - Grupo de Compradores", gci:"padrao fixo do fluxo 302",
+                  setor:"padrao fixo do fluxo 302", aprovado:"padrao fixo do fluxo 302" };
+const SETOR_OPC = ["80","70","65","60","50","40","10"];
+
+/* Regra de Imobilizado - IN-CPR-01.001 / CPC 27 */
+const IMOB = {
+ criterios:["Essencia fisica: bem tangivel mantido para uso na producao, servicos, aluguel ou fins administrativos",
+            "Vida util esperada superior a 1 ano (mais de um periodo contabil)",
+            "Beneficios economicos futuros provaveis e custo mensuravel com confiabilidade"],
+ excecoes:["NOTEBOOK","LAPTOP","CELULAR","SMARTPHONE","TABLET","COLETOR","EQUIPAMENTO LABORATORIAL"],
+ excTok:["NOTEBOOK","LAPTOP","CELULAR","SMARTPHONE","TABLET","COLETOR","IPHONE","IPAD","MACBOOK"],
+ bens:["EMPILHADEIRA","TRATOR","CAMINHAO","CAMINHONETE","AUTOMOVEL","VEICULO","ONIBUS","CARRETA","REBOQUE","COLHEDORA","RETROESCAVADEIRA","ESCAVADEIRA","MOTONIVELADORA","PA CARREGADEIRA","GERADOR","COMPRESSOR","TORNO","PRENSA","BALANCA","EMPACOTADORA","ESTEIRA","TRANSFORMADOR","SUBESTACAO","ELEVADOR","PONTE ROLANTE","COMPUTADOR","DESKTOP","SERVIDOR","MONITOR","IMPRESSORA","NOBREAK","SWITCH","ROTEADOR","PROJETOR","MESA","CADEIRA","ARMARIO","ESTANTE","GAVETEIRO","SOFA","GELADEIRA","FREEZER","MICROONDAS","BEBEDOURO","AR CONDICIONADO","SPLIT","EMPILHADOR","MOTOR ELETRICO COMPLETO","MAQUINA","EQUIPAMENTO","VEICULAR"],
+ peca:["PARAFUSO","PORCA","ARRUELA","ROLAMENTO","RETENTOR","CORREIA","FILTRO","MANGUEIRA","BUCHA","ANEL","EIXO","BICO","VALVULA","SENSOR","CABO","MANCAL","JUNTA","KIT","REPARO","PECA","COMPONENTE","ELEMENTO","LAMPADA","FUSIVEL","DISJUNTOR","CONTATOR","TERMINAL","CONECTOR","ABRACADEIRA","PINO","MOLA","TAMPA","SUPORTE","ENGRENAGEM","PISTAO","CAMISA","VEDACAO","GAXETA","ESCOVA","PASTILHA","LONA","DISCO","PNEU","CAMARA","BOMBA","GRAXA","OLEO","TINTA","PARA","REPOSICAO","CARTUCHO","TONER","BATERIA","CARREGADOR","FONTE","TECLADO","MOUSE","CARCACA","MODULO","PLACA","BARRA","CHAPA","TUBO","PERFIL","CONEXAO","LUVA","COTOVELO","CURVA","REDUCAO","FLANGE","NIPLE","UNIAO"],
+ baixoValor:["VENTILADOR","CAFETEIRA","FERRAMENTA MANUAL","CADEIRA","PERIFERICO"]
+};
+
+/* dicionario de abreviacoes e sinonimos do vocabulario interno */
+const ABREV = {
+ "ROLAM":"ROLAMENTO","ROL":"ROLAMENTO","RET":"RETENTOR","PARAF":"PARAFUSO","PRF":"PARAFUSO","PFS":"PARAFUSO","SXT":"SEXTAVADO","SEXT":"SEXTAVADO","SXI":"SEXTAVADO INTERNO",
+ "AZ":"AZUL","VD":"VERDE","VM":"VERMELHO","BR":"BRANCO","PT":"PRETO","AM":"AMARELO","CZ":"CINZA","LAR":"LARANJA",
+ "LUB":"LUBRIFICANTE","LUBR":"LUBRIFICANTE","LUBRIF":"LUBRIFICANTE","GRX":"GRAXA","OL":"OLEO",
+ "MANG":"MANGUEIRA","VALV":"VALVULA","CIL":"CILINDRO","HID":"HIDRAULICO","HIDR":"HIDRAULICO","PNEUM":"PNEUMATICO",
+ "ELET":"ELETRICO","ELETR":"ELETRICO","ELTD":"ELETRODUTO","ELETROC":"ELETROCALHA","MEC":"MECANICO","AUT":"AUTOMATICO","AUTOM":"AUTOMATICO",
+ "CX":"CAIXA","CAB":"CABO","CONEX":"CONEXAO","ABRAC":"ABRACADEIRA","ARR":"ARRUELA","PRC":"PORCA","ANL":"ANEL",
+ "EQPTO":"EQUIPAMENTO","EQUIP":"EQUIPAMENTO","MAQ":"MAQUINA","MOT":"MOTOR","BOMB":"BOMBA","COMPR":"COMPRESSOR",
+ "SEG":"SEGURANCA","PROT":"PROTETOR","AURIC":"AURICULAR","OCUL":"OCULOS","MASC":"MASCARA","BOT":"BOTINA","UNIF":"UNIFORME",
+ "LIMP":"LIMPEZA","DET":"DETERGENTE","DESINF":"DESINFETANTE","SAB":"SABONETE","PAP":"PAPEL","EXPED":"EXPEDIENTE",
+ "IMP":"IMPRESSAO","INFO":"INFORMATICA","NTB":"NOTOBOOK","NOTEB":"NOTEBOOK","CEL":"CELULAR","COMP":"COMPUTADOR",
+ "INOX":"INOXIDAVEL","GALV":"GALVANIZADO","PLAST":"PLASTICO","BORR":"BORRACHA","MAD":"MADEIRA","ACR":"ACRILICO","ACRIL":"ACRILICO",
+ "TRAT":"TRATOR","CAM":"CAMINHAO","VEIC":"VEICULO","EMPILH":"EMPILHADEIRA","COLH":"COLHEDORA",
+ "PC":"PECA","UN":"UNIDADE","PCT":"PACOTE","CJ":"CONJUNTO","CONJ":"CONJUNTO","REP":"REPARO","MONT":"MONTAGEM",
+ "P/":"PARA","C/":"COM","S/":"SEM"
+};
+const HEAD_PART = ["PARAFUSO","PORCA","ARRUELA","ROLAMENTO","RETENTOR","CORREIA","FILTRO","MANGUEIRA","BUCHA","ANEL","EIXO","BICO","VALVULA","SENSOR","MANCAL","JUNTA","ENGRENAGEM","PISTAO","VEDACAO","GAXETA","MOLA","PINO","TERMINAL","CONECTOR","ABRACADEIRA","DISJUNTOR","CONTATOR","RELE","FUSIVEL","BOMBA","CILINDRO","ACOPLAMENTO","POLIA","CORRENTE","ELEMENTO","FLANGE","COTOVELO","CURVA","REDUCAO","NIPLE","TRAVA","GRAXEIRO","CAMISA","VOLANTE","TURBINA","INJETOR","ALTERNADOR","ARRANQUE","EMBREAGEM","AMORTECEDOR","PASTILHA","LONA","ROTOR","ESTATOR","SAPATA"];
+const HEAD_NLAG = ["SUCATA","SERVICO","LOCACAO","FRETE","LICENCA","SOFTWARE","CURSO","TREINAMENTO","ASSINATURA","MANUTENCAO","CONSERTO","REFORMA","INSTALACAO","CALIBRACAO","ADESIVAGEM","IMPRESSAO"];
+const GM_MANUT = ["90001","90002","90003","90004","90101","90151"];
+const STOP = new Set(["DE","DA","DO","DOS","DAS","E","OU","A","O","AS","OS","EM","NO","NA","COM","SEM","PARA","POR","AO","UM","UMA","NCM","COD","REF","TIPO","MATERIAL","MOD","UNIDADE","PECA","PC"]);
+
+/* lexico aprendido da base 302 (24.344 registros) - semente embarcada */
+const LEXRAW = "PARAFUSO:1394:E:67:90001:86:MR1:98;2POL:906:H:57:90001:50:MR1:70;SXT:749:E:80:90001:85:MR1:97;FILTRO:720:E:76:90002:43:MR1:89;4POL:718:H:64:90001:44:MR1:70;ROLAMENTO:678:E:94:90002:80:MR1:95;PVC:669:H:76:90004:44:MR1:70;BSP:590:H:51:90001:56:MR1:76;OLEO:552:H:81:90708:70:MR1:72;UNC:540:E:85:90001:86:MR1:94;BUCHA:522:E:82:90001:74:MR1:97;NCM:477:E:81:90001:58:MR1:79;CABO:473:E:58:90001:49:MR1:70;LIS:413:E:50:90002:54:MR1:77;PARA:412:E:55:90001:41:MR1:58;ANEL:400:E:92:90001:63:MR1:96;COLHEDORA:388:E:100:90002:99:MR1:100;NAT:384:H:88:90004:52:MR1:60;PORCA:380:E:62:90001:81:MR1:97;LAMPADA:378:H:68:90001:61:MR1:80;KIT:374:E:78:90001:56:MR1:85;ELET:373:E:54:90001:81:MR1:94;CHAVE:364:H:73:90701:70:MC1:57;NBR:354:E:84:90001:67:MR1:84;TERMINAL:354:E:67:90001:91:MR1:94;90GR:353:H:69:90001:57:MR1:81;CORREIA:349:E:93:90002:75:MR1:95;8POL:348:H:56:90001:45:MR1:69;EXT:332:E:64:90001:65:MR1:87;LUVA:331:H:92:90004:46:MR1:51;RED:319:H:61:90001:32:MR1:77;CAIXA:309:H:83:90004:60:MC1:50;RETENTOR:298:E:98:90001:86:MR1:96;CIL:298:E:80:90001:66:MR1:92;5MM:293:E:55:90001:61:MR1:76;ESF:279:E:92:90002:83:MR1:97;COM:279:E:51:90001:42:MR1:56;ARRUELA:275:E:82:90002:63:MR1:97;SEG:262:H:95:90711:86:MR1:78;VALVULA:256:E:90:90001:70:MR1:94;CANETA:251:H:100:90707:98:MR1:68;CARTUCHO:249:H:96:90707:95:MR1:98;MOTOR:247:E:81:90001:53:MR1:84;ACO:238:E:50:90001:47:MR1:76;TONER:234:H:99:90707:98:MR1:89;TAMPA:234:E:59:90001:37:MR1:75;TUBO:232:H:63:90001:41:MR1:74;BICO:232:E:84:90001:71:MR1:89;1POL:231:H:61:90001:48:MR1:68;LIQ:228:H:98:90705:43:MR1:71;FOFO:227:E:62:90001:69:MR1:87;CHAPA:217:H:55:90004:57:MC1:51;ABRACADEIRA:215:E:69:90001:87:MR1:100;20L:204:H:100:90708:62:MR1:73;TRAT:200:E:80:90002:77:MR1:100;COMPR:198:H:62:90001:78:MR1:95;TINTA:197:H:93:90004:68:MR1:65;BALDE:197:H:99:90705:89:MR1:82;BARRA:194:H:70:90004:34:MC1:44;IND:193:H:68:90001:38:MR1:65;EIXO:193:E:91:90001:68:MR1:93;COD:192:E:82:90001:63:MR1:86;BORR:192:E:74:90002:69:MR1:84;RIG:189:E:87:90002:85:MR1:98;16POL:188:H:55:90001:47:MR1:69;DISJUNTOR:187:E:64:90001:94:MR1:98;TESOURA:184:H:100:90707:83:MC1:79;PLACA:183:H:53:90004:41:MR1:53;UNF:181:E:100:90001:99:MR1:100;CAPACETE:176:H:99:90711:99:MR1:87;NPT:176:H:60:90001:48:MR1:79;PINO:176:E:65:90001:39:MR1:79;MANCAL:176:E:93:90001:89:MR1:97;CONECTOR:176:E:66:90001:73:MR1:94;ROSC:174:H:91:90004:68:MC1:52;AUT:170:E:66:90002:52:MR1:93;SENSOR:169:E:90:90001:54:MR1:91;8MM:169:E:51:90001:62:MR1:80;INT:169:H:65:90004:41:MR1:77;ROSCA:169:E:81:90001:78:MR1:84;BRG:166:E:100:90001:100:MR1:100;CAM:165:H:78:90003:88:MR1:98;VASSOURA:163:H:100:90705:98:MR1:94;MET:161:H:81:90004:55:MR1:72;CURVA:160:H:62:90001:86:MR1:98;25MM:159:H:55:90001:54:MR1:81;10MM:157:E:66:90001:64:MR1:82;SUPORTE:157:E:52:90001:30:MR1:57;BOMBA:157:E:72:90001:38:MR1:80;SABONETE:156:H:100:90707:97:IA1:69;DISCO:156:H:51:90001:76:MR1:94;IMP:155:H:94:90707:74:MR1:90;220V:155:H:58:90001:46:MR1:68;FITA:155:H:94:90001:35:MR1:56;INC:154:H:97:90004:34:MR1:62;2MM:151:H:73:90001:46:MR1:70;PERFIL:148:H:81:90004:84:MC1:53;COMB:148:H:57:90002:33:MR1:67;LUBRIF:147:H:99:90708:98:MR1:98;100:146:H:62:90001:36:MR1:60;LIG:145:H:98:90004:92:MC1:74;SACO:140:H:100:90702:77:AU1:62;INOX:138:E:70:90001:62:MR1:78;PLAST:135:H:93:90004:34:MR1:47;LED:133:H:80:90004:66:MR1:50;MANGUEIRA:130:E:74:90001:47:MR1:85;FUSIVEL:129:H:70:90004:50:MR1:52;CONT:128:E:59:90001:55:MR1:88;6MM:128:H:55:90001:69:MR1:79;PORTA:127:H:53:90004:34:MR1:48;JUNTA:126:E:71:90001:40:MR1:86;DETERGENTE:124:H:100:90705:95:MR1:94;COTOVELO:124:E:56:90001:86:MR1:100;10A:121:H:65:90004:42:MR1:62;BROCA:119:E:57:90001:92:MR1:97;50MM:119:H:61:90001:49:MR1:76;PROTETOR:119:H:89:90711:78:MR1:87;ELEMENTO:119:E:75:90001:56:MR1:95;FLEX:119:H:61:90004:39:MR1:61;SINT:118:H:97:90004:52:MR1:66;ALG:117:H:100:90710:66:UF1:65;AUX:116:E:58:90001:76:MR1:97;LIXO:115:H:100:90702:80:AU1:68;5MM2:114:H:56:90001:58:MR1:64;PRETO:114:H:77:90707:35:MR1:53;TERMOMETRO:113:H:100:90707:73:MR1:58;CONIC:113:E:92:90002:71:MR1:100;PNEU:112:H:53:90003:66:MR1:67;PARAF:111:H:60:90001:53:MR1:70;CAMISA:111:H:86:90710:78:UF1:76;MOD:111:E:63:90001:47:MR1:68;MAD:111:H:96:90004:38:MR1:58;MEDICAM:108:H:100:90707:100:MR1:100;TRATOR:108:E:89:90002:81:MR1:100;12MM:108:H:51:90001:56:MR1:70;EMB:108:H:100:90004:49:MR1:60;UNX:107:H:100:90711:55:EP1:52;CAPA:107:H:67:90001:19:MR1:50;WEG:107:E:88:90001:62:MR1:76;BRANCO:107:H:76:90004:21:MR1:36;HID:106:E:75:90002:42:MR1:89;CORTE:106:E:63:90001:74:MR1:82;ACL:106:E:97:90001:98:MR1:98;500ML:106:H:100:90705:42:MR1:49;UNIAO:105:H:52:90001:61:MR1:81;EST:104:H:90:90701:46:MC1:55;PROT:104:H:97:90711:77:MR1:74;MANG:104:E:80:90001:81:MR1:86;FLANGE:102:E:66:90001:83:MR1:95;JOHN:102:E:61:90001:57:MR1:85;150:102:E:67:90003:45:MR1:80;SXI:102:E:100:90001:100:MR1:100;CAB:101:H:76:90001:51:MR1:86;OCULOS:101:H:100:90711:97:MR1:88;MEDICAMENTO:101:H:100:90707:93:MR1:65;ELAST:100:E:63:90001:65:MR1:80;1KG:100:H:96:90004:29:MR1:60;DEERE:100:E:60:90001:59:MR1:86;4MM:99:H:54:90001:56:MR1:77;690V:99:E:64:90001:91:MR1:99;CONTATOR:98:E:72:90001:93:MR1:97;TIPO:98:E:65:90001:48:MR1:65;VEDA:97:E:81:90001:70:MR1:82;AGULHA:97:H:97:90707:90:MR1:95;MAN:95:E:51:90001:66:MR1:76;PERF:94:H:84:90004:68:MR1:66;ELETRODO:93:E:86:90001:91:MR1:88;SEGURANCA:93:H:92:90711:89:MR1:97;MIN:93:H:89:90708:88:MR1:84;PAGINAS:92:H:100:90707:100:MR1:100;LUB:92:H:79:90708:68:MR1:93;PLUG:91:H:54:90001:52:MR1:93;24V:91:E:55:90001:48:MR1:64;RTG:91:H:81:90004:63:MC1:56;MOL:91:E:77:90001:73:MR1:90;ISOL:90:H:68:90001:67:MR1:67;TOMADA:90:H:92:90004:91:MC1:52;OLH:90:H:64:90001:97:MR1:99;SEXT:89:H:74:90001:79:MR1:90;HSS:89:H:57:90001:78:MR1:84;3POL:88:H:65:90001:47:MR1:76;MOLA:88:E:80:90001:43:MR1:86;BLOCO:87:E:52:90001:55:MR1:71;PRATO:87:H:95:90702:87:MR1:77;4X0:87:H:100:90707:94:MR1:100;FIX:87:E:60:90001:76:MR1:95;VEL:87:E:67:90001:56:MR1:69;CIRC:87:E:63:90001:68:MR1:89;FIO:86:E:60:90001:53:MR1:67;CL8:86:E:100:90001:100:MR1:100;16MM:86:E:60:90001:65:MR1:78;MANUAL:86:E:65:90001:60:MR1:87;MEC:86:H:53:90001:44:MR1:67;PES:86:H:74:90001:26:MR1:48;SOLDA:86:H:66:90711:40:MR1:77;MASCARA:86:H:98:90711:98:MR1:97;PAPEL:85:H:96:90707:41:MC1:52;45GR:85:E:52:90001:85:MR1:98;ANILHA:85:H:91:90004:91:MR1:55;100UN:85:H:99:90702:65:AU1:47;SERINGA:84:H:100:90707:98:MR1:99;LUBR:83:H:99:90708:96:LB1:67;FREIO:83:E:71:90003:64:MR1:73;W22:83:E:93:90001:67:MR1:88;18L:83:H:99:90004:66:MR1:73;160:83:E:83:90001:48:MR1:83;MACHO:82:E:91:90001:83:MR1:88;A105:82:H:57:90001:45:MR1:99;750V:82:E:63:90001:84:MR1:82;CONEXAO:82:E:77:90001:61:MR1:71;250V:81:H:79:90004:53:MR1:54;HELIC:81:E:51:90001:95:MR1:99;1NA:81:E:64:90001:68:MR1:94;CILINDRO:80:E:79:90001:51:MR1:85;TAM:80:H:99:90711:78:MR1:38;ELETROD:80:H:86:90004:46:MR1:65;ACRIL:80:H:98:90004:89:MR1:54;12V:80:H:61:90003:30:MR1:60;AGUA:79:H:58:90001:23:MR1:56;22MM:79:H:56:90001:49:MR1:81;ADAPTADOR:79:H:73:90004:51:MR1:49;TRAVA:79:E:87:90001:51:MR1:90;ELTD:78:H:77:90001:54:MR1:79;ACOPLAMENTO:78:E:53:90004:37:MR1:64;VEDACAO:78:E:95:90002:60:MR1:92;1KV:77:E:58:90001:82:MR1:84;3MM:76:H:71:90001:38:MR1:62;SOQ:76:H:97:90701:87:MC1:92;AZUL:76:H:83:90707:25:MR1:42;AURIC:75:H:100:90711:100:MR1:100;INTERRUPTOR:75:H:53:90004:36:MR1:65;GALV:75:H:57:90004:43:MR1:53;MANGA:74:H:84:90710:68:UF1:66;COND:73:H:60:90001:34:MR1:82;BASE:72:H:57:90001:33:MR1:63;GRAMPO:72:H:69:90004:57:MR1:72;BORRACHA:72:E:78:90001:46:MR1:79;NXR:71:E:79:90003:75:MR1:80;FLG:71:E:73:90001:75:MR1:86;VED:71:E:90:90001:52:MR1:94;LAPIS:70:H:99:90707:97:MC1:90;1MM:70:H:60:90001:53:MR1:83;CLIPES:70:H:99:90707:96:IA1:51;BATERIA:70:E:61:90001:40:MR1:67;TUB:69:E:57:90001:80:MR1:88;220:69:E:52:90001:32:MR1:77;ELETRODUTO:68:E:60:90001:79:MR1:90;20MM:68:H:65:90001:54:MR1:82;CONC:68:H:94:90711:35:MR1:87;ROLO:68:H:75:90004:41:MC1:47;ESCOVA:68:H:74:90701:35:MR1:47;100MM:68:H:72:90001:34:MR1:76;BOTAO:68:H:51:90001:43:MR1:79;ADESIVO:68:H:79:90001:28:MR1:68;VALV:67:E:81:90001:64:MR1:96;MASSA:67:H:97:90004:82:MC1:78;ENC:66:E:61:90001:61:MR1:98;CARBONO:66:E:76:90001:61:MR1:68;COMBUSTIVEL:66:E:79:90002:41:MR1:79;DIR:66:H:53:90001:83:MR1:94;DESINFETANTE:66:H:100:90705:100:MR1:91;ESP:66:H:59:90001:35:MR1:70;CORRENTE:66:E:88:90001:61:MR1:88;SHELL:66:H:100:90708:98:MR1:97;MINI:65:E:54:90001:60:MR1:88;20A:64:H:70:90004:42:MR1:73;PISO:63:H:87:90004:75:MR1:52;GUARDANAPO:63:H:100:90702:100:MR1:89;TELA:63:H:68:90004:49:MC1:43;CARREG:62:E:60:90002:52:MR1:100;FERRO:62:E:53:90001:34:MR1:60;5KG:62:E:50:90001:52:MR1:79;32MM:62:H:71:90001:37:MR1:52;AUTO:61:H:70:90003:36:MR1:84;40MM:61:H:61:90001:51:MR1:85;RELE:61:E:67:90001:51:MR1:80;DESC:61:H:90:90707:34:MR1:79;EMEN:61:H:61:90004:61:MC1:52;84879000:61:E:100:90001:100:MR1:100;500:61:H:84:90004:62:MR1:79;RODA:61:E:75:90001:34:MR1:82;PRESSAO:60:E:92:90001:57:MR1:88;ABS:60:H:90:90711:37:MR1:72;GRAXEIRO:60:E:100:90001:100:MR1:100;4X1:60:H:50:90001:55:MR1:75;150LBS:60:H:57:90001:82:MR1:92;AUTOM:59:H:83:90003:56:MR1:97;PRESS:59:E:76:90001:69:MR1:85;CONJUNTO:59:E:66:90001:41:MR1:56;7MM:59:H:63:90001:44:MR1:69;200:59:E:68:90001:47:MR1:71;PARTIDA:59:E:88:90003:42:MR1:88;FENDA:59:H:73:90701:61:MR1:63;CAMINHAO:58:H:71:90003:86:MR1:98;TOM:58:H:91:90004:86:MC1:55;PEAD:58:H:71:90711:40:MR1:69;EMENDA:58:H:50:90001:59:MR1:90;32A:58:E:55:90001:69:MR1:81;BOTINA:58:H:100:90711:100:EP1:98;150MM:58:H:81:90004:26:MR1:64;COR:57:H:56:90001:33:MR1:47;CONCHA:57:H:100:90711:93:MR1:95;SELO:57:E:74:90001:60:MR1:75;ELETROC:56:H:93:90004:73:MR1:88;MULTIUSO:56:H:100:90705:59:MR1:50;MULT:56:H:91:90004:41:MR1:82;6POL:56:H:71:90001:43:MR1:68;HIDR:56:H:57:90707:36:MR1:68;POL:56:H:54:90001:39:MR1:80;DIG:55:H:84:90707:58:MR1:73;500G:55:H:93:90706:24:MR1:40;CONCR:55:H:71:90001:73:MR1:85;CALCA:55:H:98:90710:91:UF1:82;COPO:54:H:89:90701:30:MC1:48;5A2:54:H:87:90004:69:MC1:69;16A:54:H:57:90001:52:MR1:72;200MM:54:H:85:90702:22:MR1:83;MODULO:53:H:64:90001:34:MR1:79;COBRE:53:E:85:90001:58:MR1:64;L70F:53:E:55:90002:51:MR1:98;COLA:53:H:85:90001:55:MR1:55;ASTM:53:E:85:90001:66:MR1:77;300MM:53:H:89:90705:43:MR1:70;GAS:52:H:60:90001:37:MR1:65;9MM:52:H:69:90001:42:MR1:67;400MM:52:H:81:90702:38:MR1:85;ACV:52:H:94:90701:88:MC1:81;METAL:52:E:52:90001:75:MR1:87;INSULOK:52:E:52:90001:83:MR1:100;VIDRO:52:H:65:90004:19:MR1:50;MATERIAL:52:E:73:90001:60:MR1:62;LIMPADOR:52:H:65:90705:56:ML1:33;6000MM:52:H:71:90004:62:MR1:56;PRETA:52:H:92:90707:56:MR1:38;IMPRESSORA:51:H:100:90707:98:MR1:71;ROL:51:E:51:90001:33:MR1:86;18MM:51:H:71:90001:76:MR1:71;TRAV:51:E:78:90001:82:MR1:92;CPVC:51:H:53:90001:69:MR1:90;RSF:51:E:84:90001:98:MR1:100";
+const LEX = {};
+LEXRAW.split(";").forEach(function(r){
+ const p = r.split(":"); if(p.length<8) return;
+ const tm = p[2]==="E"?"ERSA":(p[2]==="H"?"HIBE":"NLAG");
+ LEX[p[0]] = {n:+p[1], tm:tm, ptm:+p[3]/100, gm:p[4], pgm:+p[5]/100, gc:p[6], pgc:+p[7]/100};
+});
+
+/* ================= UTIL ================= */
+const $ = function(s){return document.querySelector(s)};
+const $$ = function(s){return Array.prototype.slice.call(document.querySelectorAll(s))};
+function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("on");setTimeout(function(){t.classList.remove("on")},2200)}
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]})}
+function deacc(s){return String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"")}
+function norm(s){
+ let t = deacc(String(s||"")).toUpperCase();
+ t = t.replace(/([0-9])[,.]([0-9])/g,"$1.$2");
+ t = t.replace(/["']/g," POL ").replace(/POLEGADAS?/g," POL ");
+ t = t.replace(/[^A-Z0-9./]+/g," ").replace(/\s+/g," ").trim();
+ return t;
+}
+function expand(t){ return ABREV[t]||t; }
+function toks(s){
+ const out=[]; const base=norm(s).split(" ");
+ for(let i=0;i<base.length;i++){
+  let w=base[i]; if(!w) continue;
+  w.split(" ").forEach(function(x){
+   if(!x||STOP.has(x)) return;
+   if(x.length<2) return;
+   if(x.length>4 && /S$/.test(x) && !/SS$/.test(x)) x=x.slice(0,-1); /* singular */
+   out.push(x);
+  });
+ }
+ return out;
+}
+function tri(s){const t=" "+norm(s).replace(/\s+/g," ")+" ";const S=new Set();for(let i=0;i<t.length-2;i++)S.add(t.substr(i,3));return S}
+function diceSet(A,B){if(!A.size||!B.size)return 0;let c=0;A.forEach(function(x){if(B.has(x))c++});return 2*c/(A.size+B.size)}
+function lev(a,b){
+ a=norm(a);b=norm(b);
+ if(a===b) return 1;
+ const m=a.length,n=b.length; if(!m||!n) return 0;
+ if(Math.abs(m-n)>Math.max(m,n)*0.6) return 0;
+ let prev=new Array(n+1),cur=new Array(n+1);
+ for(let j=0;j<=n;j++)prev[j]=j;
+ for(let i=1;i<=m;i++){cur[0]=i;
+  for(let j=1;j<=n;j++){cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1))}
+  const t=prev;prev=cur;cur=t;
+ }
+ return 1-prev[n]/Math.max(m,n);
+}
+
+/* ================= INDICE E APRENDIZADO ================= */
+const S = { base:[], idx:new Map(), df:new Map(), pref:new Map(), lexBase:new Map(), headBase:new Map(), fb:[], log:[], results:[], pwd:"cadastro302" };
+
+function buildIndex(){
+ S.idx=new Map(); S.df=new Map(); S.lexBase=new Map(); S.pref=new Map();
+ S.headBase=new Map();
+ for(let i=0;i<S.base.length;i++){
+  const r=S.base[i];
+  r._t = toks((r.d||"")+" "+(r.c||""));
+  const uniq=new Set(r._t);
+  const hd0=r._t[0]||"";
+  if(hd0 && (r.tm||r.gm||r.gc)){
+   let he=S.headBase.get(hd0); if(!he){he={n:0,tm:{},gm:{},gc:{}};S.headBase.set(hd0,he)}
+   he.n++;
+   if(r.tm) he.tm[r.tm]=(he.tm[r.tm]||0)+1;
+   if(r.gm) he.gm[r.gm]=(he.gm[r.gm]||0)+1;
+   if(r.gc) he.gc[r.gc]=(he.gc[r.gc]||0)+1;
+  }
+  uniq.forEach(function(t){
+   if(!S.idx.has(t)) S.idx.set(t,[]);
+   S.idx.get(t).push(i);
+   S.df.set(t,(S.df.get(t)||0)+1);
+   const p4=t.substr(0,4);
+   if(!S.pref.has(p4)) S.pref.set(p4,[]);
+   if(S.pref.get(p4).indexOf(t)<0) S.pref.get(p4).push(t);
+   if(r.tm||r.gm||r.gc){
+    let e=S.lexBase.get(t); if(!e){e={n:0,tm:{},gm:{},gc:{}};S.lexBase.set(t,e)}
+    e.n++;
+    if(r.tm) e.tm[r.tm]=(e.tm[r.tm]||0)+1;
+    if(r.gm) e.gm[r.gm]=(e.gm[r.gm]||0)+1;
+    if(r.gc) e.gc[r.gc]=(e.gc[r.gc]||0)+1;
+   }
+  });
+ }
+}
+function idf(t){
+ const N = S.base.length || 24344;
+ const d = S.df.get(t) || (LEX[t]? LEX[t].n : 1);
+ return Math.log(1 + N/(1+d));
+}
+function lexLook(tk){
+ const lb=S.lexBase.get(tk); if(lb&&lb.n>=3) return {src:"base",e:lb};
+ if(LEX[tk]) return {src:"seed",e:LEX[tk]};
+ if(tk.length>=3){
+  const pf=S.pref.get(tk.substr(0,Math.min(4,tk.length)));
+  if(pf){ let bt=null,bn=0;
+   pf.forEach(function(t2){ const x=S.lexBase.get(t2); if(x&&x.n>bn&&(t2.indexOf(tk)===0||tk.indexOf(t2)===0)){bn=x.n;bt=x} });
+   if(bt&&bn>=3) return {src:"base",e:bt,soft:true};
+  }
+  let sk=null,sn=0;
+  for(const k in LEX){ if((k.indexOf(tk)===0||tk.indexOf(k)===0)&&Math.min(k.length,tk.length)>=3&&LEX[k].n>sn){sn=LEX[k].n;sk=k} }
+  if(sk) return {src:"seed",e:LEX[sk],soft:true};
+ }
+ return null;
+}
+function best(o){let k=null,v=-1,tot=0;for(const x in o){tot+=o[x];if(o[x]>v){v=o[x];k=x}}return {k:k,p:tot?v/tot:0}}
+
+/* candidatos por indice invertido */
+function candidates(qt){
+ const score=new Map();
+ const uq=Array.from(new Set(qt));
+ function add(list,w){ if(!list) return; if(list.length > Math.max(600, S.base.length*0.30)) return;
+  for(let i=0;i<list.length;i++) score.set(list[i],(score.get(list[i])||0)+w) }
+ uq.forEach(function(t){
+  const w=idf(t);
+  add(S.idx.get(t), w);
+  const pf=S.pref.get(t.substr(0,4));
+  if(pf) pf.forEach(function(t2){ if(t2!==t) add(S.idx.get(t2), w*0.55) });
+ });
+ const arr=Array.from(score.entries()).sort(function(a,b){return b[1]-a[1]}).slice(0,260);
+ return arr.map(function(x){return x[0]});
+}
+/* casamento tolerante a abreviacao, prefixo e erro de digitacao */
+function tokMatch(a,b){
+ if(a===b) return 1;
+ const m=Math.min(a.length,b.length);
+ if(m>=2 && (a.substr(0,m)===b.substr(0,m))) return m>=4?0.9:0.84;
+ if(m>=4){ const l=lev(a,b); if(l>=0.8) return 0.75; if(l>=0.68) return 0.55 }
+ return 0;
+}
+function cov(A,B){
+ let num=0,den=0;
+ for(let i=0;i<A.length;i++){
+  const w=idf(A[i]); den+=w; let bst=0;
+  for(let j=0;j<B.length;j++){ const s=tokMatch(A[i],B[j]); if(s>bst){bst=s; if(bst===1)break} }
+  num+=w*bst;
+ }
+ return den? num/den : 0;
+}
+function simScore(qt,qs,r){
+ const A=Array.from(new Set(qt)), B=Array.from(new Set(r._t||[]));
+ if(!A.length||!B.length) return 0;
+ const cq=cov(A,B), cr=cov(B,A);
+ const tr=diceSet(qs, r._tri||(r._tri=tri((r.d||"")+" "+(r.c||""))));
+ const mx=Math.max(cq,cr), mn=Math.min(cq,cr);
+ let sc = 0.52*mx + 0.24*mn + 0.24*tr;
+ /* contencao: descricao abreviada contida na existente (CANETA AZ vs CANETA AZUL) */
+ if(cq>=0.86 || cr>=0.86) sc = Math.max(sc, 0.76 + 0.16*tr);
+ if(A.length<=3 && B.length<=3) sc = Math.max(sc, 0.6*sc + 0.4*lev(A.join(" "),B.join(" ")));
+ return Math.max(0,Math.min(1,sc));
+}
+function neighbors(desc, extra, k){
+ if(!S.base.length) return [];
+ const qt = toks(desc+" "+(extra||""));
+ const qs = tri(desc+" "+(extra||""));
+ const cand = candidates(qt);
+ const out=[];
+ for(let i=0;i<cand.length;i++){ const r=S.base[cand[i]]; out.push({r:r, s:simScore(qt,qs,r)}) }
+ out.sort(function(a,b){return b.s-a.s});
+ return out.slice(0,k||18);
+}
+
+/* ================= PRIOR DO SUBSTANTIVO PRINCIPAL (real, base 302 - 24.344 registros) ================= */
+const HEADRAW = "PARAFUSO:1358:E:66:90001:86:MR1:98;FILTRO:644:E:77:90002:44:MR1:90;ROLAMENTO:636:E:94:90002:83:MR1:96;BUCHA:504:E:82:90001:74:MR1:96;LAMPADA:377:H:68:90001:61:MR1:80;OLEO:374:H:98:90708:92:MR1:68;PORCA:362:E:60:90001:81:MR1:97;TERMINAL:338:E:65:90001:91:MR1:95;CORREIA:327:E:93:90002:78:MR1:95;KIT:327:E:78:90001:59:MR1:85;LUVA:320:H:94:90004:48:MR1:50;CHAVE:318:H:75:90701:72:MC1:61;ANEL:306:E:92:90001:59:MR1:95;RETENTOR:280:E:98:90001:87:MR1:96;ARRUELA:267:E:82:90002:65:MR1:97;CABO:267:E:74:90001:61:MR1:75;CAIXA:251:H:87:90004:73:MC1:56;CANETA:246:H:100:90707:99:MR1:69;CARTUCHO:243:H:98:90707:98:MR1:98;ABRACADEIRA:215:E:69:90001:87:MR1:100;VALVULA:209:E:90:90001:70:MR1:96;TUBO:200:H:65:90001:41:MR1:75;CHAPA:189:H:60:90004:63:MC1:54;DISJUNTOR:186:E:65:90001:94:MR1:98;BALDE:184:H:99:90705:91:MR1:82;TESOURA:182:H:100:90707:84:MC1:80;BICO:174:E:98:90001:84:MR1:98;BARRA:169:H:73:90004:38:MC1:49;CAPACETE:166:H:100:90711:100:MR1:90;PLACA:164:H:53:90004:41:MR1:51;VASSOURA:163:H:100:90705:98:MR1:94;CONECTOR:162:E:64:90001:76:MR1:96;COD:157:E:86:90001:66:MR1:91;TINTA:156:H:94:90004:83:MR1:61;SABONETE:155:H:100:90707:98:IA1:70;CURVA:151:H:62:90001:89:MR1:99;DISCO:145:H:52:90001:78:MR1:94;TAMPA:143:E:57:90001:35:MR1:74;SENSOR:141:E:91:90001:53:MR1:91;TE:141:H:91:90004:91:MR1:54;SUPORTE:131:H:51:90001:27:MR1:57;SACO:129:H:100:90702:81:AU1:67;PERFIL:127:H:87:90004:91:MC1:58;CJ:126:E:55:90001:39:MR1:54;DETERGENTE:124:H:100:90705:95:MR1:94;TONER:123:H:98:90707:97:MR1:80;PINO:120:E:71:90002:38:MR1:76;COTOVELO:118:E:53:90001:86:MR1:100;BROCA:115:E:57:90001:93:MR1:97;FITA:113:H:97:90001:43:MR1:51;TERMOMETRO:113:H:100:90707:73:MR1:58;MANCAL:112:E:92:90001:88:MR1:96;PROTETOR:111:H:92:90711:81:MR1:89;FUSIVEL:110:H:78:90004:58:MC1:53;MEDICAM:108:H:100:90707:100:MR1:100;MANGUEIRA:105:E:70:90001:41:MR1:87;CAMISA:104:H:92:90710:84:UF1:81;ELEMENTO:102:E:72:90001:55:MR1:96;MEDICAMENTO:100:H:100:90707:93:MR1:66;OCULOS:99:H:100:90711:99:MR1:90;CONTATOR:98:E:72:90001:93:MR1:97;JUNTA:96:E:70:90001:32:MR1:83;ELETRODO:87:E:85:90001:91:MR1:87;MASCARA:83:H:100:90711:100:MR1:98;SERINGA:82:H:100:90707:99:MR1:100;AGULHA:81:H:99:90707:95:MR1:99;BOMBA:81:E:75:90001:35:MR1:85;PRATO:81:H:98:90702:94:MR1:80;ANILHA:80:H:96:90004:96:MR1:53;FLANGE:79:E:58:90001:89:MR1:99;TOMADA:79:H:97:90004:96:MC1:58;BLOCO:78:E:51:90001:56:MR1:73;CAPA:78:H:60:90002:24:MR1:62;CONEXAO:76:E:75:90001:61:MR1:71;ADAPTADOR:75:H:73:90004:53:MR1:51;PNEU:71:H:54:90003:75:MR1:51;CLIPES:70:H:99:90707:96:IA1:51;GRAMPO:69:H:71:90004:58:MR1:72;LUBRIF:69:H:100:90708:100:MR1:99;PORTA:69:H:65:90004:41:MR1:54;EIXO:67:E:81:90001:52:MR1:91;LAPIS:67:H:99:90707:97:MC1:91;MOTOR:67:E:84:90001:46:MR1:90;DESINFETANTE:66:H:100:90705:100:MR1:91;INTERRUPTOR:66:H:52:90004:36:MR1:64;GUARDANAPO:62:H:100:90702:100:MR1:90;ACOPLAMENTO:61:H:59:90004:48:MR1:54;BOTAO:58:E:52:90004:48:MR1:86;BOTINA:58:H:100:90711:100:EP1:98;UNIAO:58:E:78:90001:98:MR1:100;BATERIA:56:E:55:90001:39:MR1:68;SELO:55:E:73:90001:62:MR1:75;CILINDRO:54:E:78:90001:56:MR1:87;CALCA:53:H:100:90710:94:UF1:85;ELETRODUTO:53:E:51:90001:75:MR1:91;TELA:53:H:72:90004:58:MC1:49;CONJUNTO:51:E:65:90001:35:MR1:53;MASSA:51:H:98:90004:94:MC1:88;PLUG:51:E:75:90001:82:MR1:94;RELE:49:E:78:90001:63:MR1:96;ACUCAR:48:H:94:90702:88:MR1:83;ADESIVO:48:H:75:90001:31:MR1:81;ESCOVA:48:H:90:90701:42:MC1:54;SABAO:47:H:100:90705:100:MR1:85;VEDACAO:47:E:96:90002:62:MR1:89;ALCOOL:46:H:98:90707:70:MR1:72;MOLA:46:E:78:90003:37:MR1:98;PROT:46:H:100:90711:100:MR1:100;CAPACITOR:45:E:100:90101:89:MR1:100;DETERG:45:H:100:90705:100:MR1:100;PAPEL:45:H:100:90705:44:MC1:49;ENGRENAGEM:43:E:91:90001:51:MR1:98;CORRENTE:42:E:86:90001:67:MR1:93;JOGO:41:E:51:90701:39:MR1:49;TERMOM:41:H:100:90707:80:MC1:71;COLA:40:H:95:90001:65:MR1:58;COLAR:40:E:60:90151:58:MR1:95;TAMPAO:40:H:70:90004:70:MR1:53;BOBINA:39:E:79:90001:56:MR1:90;CAMARA:39:E:72:90002:49:MR1:97;MACHO:39:E:100:90001:100:MR1:100;BUJAO:38:E:68:90001:66:MR1:100;ATADURA:37:H:100:90707:97:MR1:97;BASE:35:H:77:90004:37:MR1:51;LIMPADOR:35:H:89:90705:77:ML1:46;LIXA:35:H:83:90004:57:MC1:60;ROLO:35:H:86:90004:71:MC1:74;TORNEIRA:35:H:89:90151:71:MR1:77;CHAVETA:34:H:88:90004:79:MC1:88;MODULO:34:H:65:90001:32:MR1:79;PRENSA:34:E:79:90001:88:MR1:97;REDUCAO:34:H:94:90004:59:MR1:97;ROLETE:34:E:94:90001:68:MR1:100;BORNE:33:E:55:90001:70:MR1:97;CALCO:33:E:94:90001:48:MR1:88;CAMISETA:33:H:100:90710:100:UF1:100;GRAXA:33:H:94:90708:94:LB1:73;ALICATE:32:H:88:90701:91:MR1:63;TELHA:32:H:84:90004:78:MR1:50;ARAME:31:H:94:90004:90:MR1:65;CHUMBADOR:31:H:90:90151:55:MC1:77;CLIPE:31:H:100:90707:61:MC1:94;FONTE:31:E:61:90001:84:MR1:87;LUMINARIA:31:H:100:90004:100:MR1:65;PREGO:31:H:77:90004:77:MR1:52;CANECA:30:E:67:90002:60:MR1:67;CONDULETE:30:H:70:90004:70:MR1:40;ISOLADOR:30:E:63:90001:47:MR1:97;PAINEL:30:E:53:90004:43:MR1:50;CINTA:29:E:62:90001:55:MR1:72;PISO:29:H:93:90004:97:MC1:52;VENTOINHA:29:E:100:90001:83:MR1:100;CAFE:28:H:96:90702:89:MR1:75;ALGODAO:27:H:100:90707:100:MR1:96;EMENDA:27:E:63:90001:81:MR1:89;JALECO:27:H:96:90711:74:EP1:67;REGISTRO:27:H:78:90004:85:MR1:70;TRENA:27:H:100:90701:93:MR1:63;ENGATE:26:E:58:90001:77:MR1:96;TABUA:26:H:100:90004:92:MC1:54;TEE:26:H:92:90004:88:MR1:69;ACIDO:25:H:96:90706:96:LB2:80;ADITIVO:25:H:92:90151:44:MR1:56;BORRACHA:24:E:79:90002:33:MR1:75;CANTONEIRA:24:E:71:90004:58:MR1:54;GAXETA:24:E:83:90001:96:MR1:100;NIPLE:24:H:83:90004:83:MC1:83;PANO:24:H:96:90705:92:MC1:42;POLIA:24:E:71:90001:71:MR1:88;RESIDUO:24:N:100:90151:100:IN1:96;SOQUETE:24:E:54:90004:38:MR1:58;CORDAO:23:E:65:90001:78:MR1:87;ESPACADOR:23:H:57:90004:52:MR1:65;FAROL:23:E:70:90003:43:MR1:91;FECHADURA:23:H:83:90004:61:MR1:61;LONA:23:H:70:90004:43:MC1:52;PA:23:H:61:90701:52:MR1:65;AMORTECEDOR:22:E:77:90003:36:MR1:82;CHICOTE:22:E:77:90002:59:MR1:86;DOBRADICA:22:H:73:90004:77:MC1:55;PINCEL:22:H:95:90004:64:MC1:82;QUADRO:22:H:82:90004:50:MC1:41;REFLETOR:22:H:95:90004:91:MC1:68;RODA:22:E:91:90001:41:MR1:82;CONJ:21:E:57:90001:33:MR1:71;GUIA:21:E:81:90001:57:MR1:86;LAMINA:21:H:81:90003:43:MR1:81;SERRA:21:H:90:90701:48:MR1:52;CONTROLADOR:20:E:80:90001:80:MR1:95;ESTICADOR:20:H:70:90004:65:MC1:65;INSERTO:20:E:90:90001:60:MR1:100;CATALISADOR:19:H:95:90001:68:MR1:63;ELO:19:E:100:90001:68:MR1:100;LIMA:19:E:58:90701:79:MR1:37;REGULADOR:19:E:100:90001:79:MR1:89;SAIDA:19:H:84:90004:89:MR1:58;TRAVA:19:E:74:90002:42:MR1:74;VENTILADOR:19:E:95:90002:47:MR1:42;CADEADO:18:H:100:90701:67:MC1:56;CAL:18:H:61:90710:33:MR1:44;CUBO:18:E:78:90003:39:MR1:89;VEDA:18:E:94:90002:50:MR1:39;COMPRESSOR:17:E:59:90003:47:MR1:94;COPO:17:H:94:90702:82:MC1:59;HASTE:17:E:65:90001:41:MR1:76;PALHETA:17:E:88:90003:65:MR1:71;PENEIRA:17:H:65:90701:47:ME2:41;SAPATA:17:E:88:90002:47:MR1:76;BOTA:16:H:100:90711:100:EP1:94;CANALETA:16:H:88:90004:50:MC1:50;ETIQUETA:16:H:69:90001:38:MR1:56;JUNCAO:16:H:94:90004:94:MC1:75;LENTE:16:H:75:90711:44:MR1:56;PARAF:16:H:56:90001:88:MR1:94;PASTILHA:16:H:63:90003:81:MR1:75;PROTECAO:16:E:81:90002:50:MR1:75;ROTOR:16:E:100:90001:81:MR1:100;AGUA:15:H:80:90703:67:AL1:67;ARGAMASSA:15:H:100:90151:93:MR1:47;BARRAMENTO:15:H:60:90004:47:MR1:87;CABECOTE:15:E:67:90002:60:MR1:93;COXIM:15:E:73:90003:40:MR1:87;ESPARADRAPO:15:H:100:90707:93:MR1:93;EXTINTOR:15:H:100:90004:93:MC1:80;LEITE:15:H:80:90703:93:AL1:100;LIMPA:15:H:100:90705:60:ML1:53;MARTELO:15:H:80:90701:87:MC1:73;REFIL:15:H:60:90001:33:MR1:40;REPARO:15:E:87:90001:53:MR1:87;VERGALHAO:15:H:73:90004:73:MR1:67;CONTRA:14:E:93:90001:57:MR1:93;CORDA:14:H:71:90701:50:MR1:50;DESEMPENADEIRA:14:H:100:90001:79:MR1:79;GRAXEIRA:14:E:100:90002:71:MR1:100;IMPERMEABILIZANTE:14:H:100:90004:64:MC1:86;MEDIDOR:14:E:71:90001:43:MR1:71;REJUNTE:14:H:100:90004:100:MR1:79;VIGA:14:E:57:90004:43:MR1:57;BRACO:13:E:100:90002:69:MR1:92;CA:13:E:69:90004:54:MR1:46;CARREGADOR:13:E:54:90001:46:IS1:31;CONVERSOR:13:E:62:90001:54:MR1:62;ESPUMA:13:H:100:90004:54:MR1:62;FIO:13:E:54:90001:31:MR1:54;FORRO:13:H:100:90004:100:MR1:69;LIXEIRA:13:H:100:90702:62:ML1:46;MANTA:13:H:77:90004:46:MC1:54;PASTA:13:H:85:90707:62:MR1:62;PERFILADO:13:H:100:90004:100:MR1:62;PURGADOR:13:E:100:90001:100:MR1:100;SAB:13:H:100:90707:100:MR1:100;TRANSMISSOR:13:E:100:90001:85:MR1:100;ABRA:12:E:75:90001:50:MR1:67;BANDEJA:12:H:67:90004:67:MR1:75;DOCE:12:H:83:90703:92:AL1:92;JG:12:E:50:90001:33:MR1:50;MACANETA:12:E:58:90003:67:MR1:75;POSTE:12:H:92:90004:83:MR1:75;REBITE:12:H:67:90004:42:MR1:100;SOLVENTE:12:H:92:90004:58:MC1:42;VIDRO:12:H:58:90004:50:MR1:92;BALAO:11:H:100:90706:73:LB2:73;CARTAO:11:E:73:90001:82:MR1:82;COLHER:11:H:100:90004:55:MR1:55;CONE:11:E:73:90002:55:MR1:64;DUTO:11:H:73:90004:73:MR1:55;EMEN:11:E:100:90001:100:MR1:100;GAZE:11:H:100:90707:100:MR1:100;LANTERNA:11:E:64:90003:36:MR1:45;LENCOL:11:H:91:90707:45:MC1:45;MANDRIL:11:E:91:90001:91:MR1:91;MANGA:11:E:64:90001:45:MR1:45;MEDIC:11:H:100:90707:100:MR1:100;PAO:11:H:82:90703:91:AL1:100;PAR:11:E:73:90003:45:MR1:55;PRIMER:11:H:100:90004:91:MR1:91;RESINA:11:H:82:90004:64:MR1:91;SINALIZADOR:11:H:64:90001:45:MR1:55;SOL:11:H:100:90706:100:MC1:55;TAPETE:11:H:100:90707:73:MC1:73;TIJOLO:11:H:100:90004:91:MR1:64;ASSENTO:10:H:80:90004:80:MR1:60;BRACADEIRA:10:E:100:90002:70:MR1:100;CAIBRO:10:H:100:90004:90:MC1:60;CAMERA:10:H:80:90709:50:MR1:60;DILUENTE:10:H:100:90004:50:MC1:80;DISPOSITIVO:10:E:90:90001:100:MR1:100;ELETROCALHA:10:H:100:90004:80:MR1:60;FARINHA:10:H:70:90703:90:AL1:100;FERRO:10:E:50:90004:40:MR1:60;GARRAFA:10:H:80:90702:70:MR1:70;GAS:10:H:90:90001:30:MR1:80;MANGOTE:10:E:80:90002:60:MR1:80;MANILHA:10:H:60:90001:30:MC1:40;MAO:10:H:90:90004:80:MC1:50;MEIA:10:H:50:90004:40:MR1:50;NIVEL:10:H:100:90004:70:MC1:60;PARA:10:H:60:90004:50:MR1:100;RALO:10:H:100:90004:100:MC1:50;RIPA:10:H:100:90151:80:MC1:50;SAL:10:H:90:90703:90:AL1:90;TANQUE:10:E:70:90002:60:MR1:90;VERNIZ:10:H:100:90004:50:MC1:40;ALAVANCA:9:E:100:90002:44:MR1:78;ALTERNADOR:9:E:100:90002:89:MR1:89;CARCACA:9:E:100:90002:56:MR1:78;DESODORIZADOR:9:H:89:90705:100:MC1:78;DIFUSOR:9:H:67:90705:56:ML1:56;ESTATOR:9:E:100:90001:78:MR1:89;FACA:9:E:56:90002:44:MR1:56;FLUIDO:9:H:78:90003:44:MR1:78;GARFO:9:H:56:90702:33:ME2:33;GRADE:9:E:89:90001:67:MR1:78;IMPULSOR:9:E:78:90002:56:MR1:100;INVERSOR:9:E:100:90001:89:MR1:78;LINHA:9:H:56:90004:33:MC1:44;PARABRISA:9:E:56:90003:67:MR1:89;PENTE:9:E:100:90001:100:MR1:100;PILHA:9:H:89:90707:89:MC1:78;PINHAO:9:E:67:90001:33:MR1:89;POSICIONADOR:9:E:100:90001:89:MR1:100;PRESILHA:9:E:89:90001:44:MR1:78;REGUA:9:H:100:90701:44:MR1:56;RODO:9:H:100:90702:44:MC1:44;TALHADEIRA:9:H:78:90004:56:MR1:100;TRILHO:9:H:56:90001:78:MR1:89;ACIONADOR:8:E:50:90004:38:MR1:75;APOIO:8:E:63:90002:63:MR1:50;ARROZ:8:H:88:90703:88:AL1:100;AUTOMATICO:8:H:88:90003:100:MR1:88;BOCAL:8:E:100:90001:100:MR1:100;BROXA:8:H:100:90004:63:MR1:63;CARNE:8:H:88:90703:88:AL1:100;DETECTOR:8:E:63:90001:63:MR1:75;DPS:8:H:63:90001:88:MR1:100;ESCADA:8:H:75:90701:75:MU1:50;EXTENSOR:8:H:75:90001:38:MR1:75;FONE:8:H:100:90707:50:IS1:63;FORMULARIO:8:H:100:90707:100:ME2:63;MOLDE:8:E:100:90001:88:MR1:88;OLHAL:8:E:100:90001:63:MR1:88;PATIM:8:E:63:90003:100:MR1:88;PEDRA:8:H:100:90151:50:MC1:50;PIVO:8:E:75:90003:75:MR1:63;REATOR:8:H:100:90101:100:MC1:88;SOLENOIDE:8:E:100:90002:50:MR1:88;UNIDADE:8:E:100:90001:88:MR1:88;ACABAMENTO:7:H:100:90004:86:MR1:86;ACUMULADOR:7:E:100:90002:57:MR1:100;AGITADOR:7:E:100:90001:100:MR1:100;ATUADOR:7:H:57:90002:43:MR1:86;BATENTE:7:E:86:90003:43:MR1:71;BOIA:7:H:57:90001:57:MR1:71;BUZINA:7:E:57:90001:57:MR1:100;CAPAC:7:H:100:90711:100:MR1:100;CHUVEIRO:7:H:86:90004:71:MR1:71;CLORETO:7:H:100:90706:100:LB2:100;COLETE:7:H:100:90711:100:MC1:43;CONTATO:7:E:100:90002:100:MR1:100;DESENGRAXANTE:7:H:100:90705:57:MC1:57;DIODO:7:E:100:90001:100:MR1:100;ESTOPA:7:H:86:90705:71:MC1:71;FIXADOR:7:E:71:90001:43:MR1:86;GANCHO:7:E:86:90001:71:MR1:71;GUARNICAO:7:E:57:90004:43:MR1:71;INSETICIDA:7:H:100:90705:86:MC1:86;JANELA:7:H:71:90004:57:MC1:43;JAQUETA:7:H:100:90710:100:UF1:100;LACRE:7:H:100:90707:57:MC1:71;MARCADOR:7:H:100:90707:100:ME2:100;MEMORIA:7:H:57:90709:57:SH1:57;MILHO:7:H:57:90703:100:AL1:86;MOCHILA:7:H:100:90707:71:ME2:71;MOUSE:7:H:100:90709:86:IS1:43;PISTOLA:7:E:86:90001:57:MR1:86;PLATO:7:E:71:90002:86:MR1:86;PONTEIRA:7:E:100:90001:43:MR1:100;REDUTOR:7:E:100:90001:100:MR1:86;RESPIRADOR:7:H:86:90711:100:MR1:57;SIFAO:7:H:86:90001:57:MR1:57;TALABARTE:7:H:71:90711:43:MR1:57;TECLADO:7:H:71:90709:29:MR1:86;TENSOR:7:E:100:90002:43:MR1:100;TRINCHA:7:H:100:90001:71:MR1:86;VASO:7:H:100:90004:71:MC1:57";
+const HEAD = {};
+HEADRAW.split(";").forEach(function(r){
+ const p=r.split(":"); if(p.length<8) return;
+ HEAD[p[0]]={n:+p[1], tm:(p[2]==="E"?"ERSA":(p[2]==="H"?"HIBE":"NLAG")), ptm:+p[3]/100, gm:p[4], pgm:+p[5]/100, gc:p[6], pgc:+p[7]/100};
+});
+/* complemento curado para substantivos tipicos com pouco historico no 302 */
+const HEAD_CUR = {
+ "CIMENTO":["HIBE","90151","MC1"],"AREIA":["HIBE","90151","MC1"],"BRITA":["HIBE","90151","MC1"],
+ "CONCRETO":["HIBE","90151","MC1"],"MADEIRA":["HIBE","90004","MC1"],"COMPENSADO":["HIBE","90004","MC1"],
+ "IMPRESSORA":["HIBE","90707","MR1"],"MONITOR":["HIBE","90709","IS1"],"MOUSE":["HIBE","90709","IS1"],
+ "TECLADO":["HIBE","90709","IS1"],"CABO_REDE":["HIBE","90709","IS1"],"PENDRIVE":["HIBE","90709","IS1"],
+ "ENVELOPE":["HIBE","90707","IA1"],"GRAMPEADOR":["HIBE","90707","IA1"],"PASTA":["HIBE","90707","IA1"],
+ "AVENTAL":["HIBE","90711","EP1"],"PROTETOR_AURICULAR":["HIBE","90711","EP1"],"CINTO":["HIBE","90711","EP1"],
+ "PERFURATRIZ":["ERSA","90002","MR1"],"MANOMETRO":["ERSA","90001","MR1"],"PRESSOSTATO":["ERSA","90001","MR1"],
+ "TRANSDUTOR":["ERSA","90001","MR1"],"INJETOR":["ERSA","90002","MR1"],"TURBINA":["ERSA","90002","MR1"],
+ "PISTAO":["ERSA","90002","MR1"],"BIELA":["ERSA","90002","MR1"],"VIRABREQUIM":["ERSA","90002","MR1"],
+ "DESINCRUSTANTE":["HIBE","90705","ML1"],"AGUARRAS":["HIBE","90004","MC1"],"THINNER":["HIBE","90004","MC1"]
+};
+function headLook(hd){
+ if(!hd) return null;
+ const hb=S.headBase.get(hd);
+ if(hb && hb.n>=2) return {src:"base", n:hb.n, tm:best(hb.tm), gm:best(hb.gm), gc:best(hb.gc)};
+ if(HEAD[hd]){ const e=HEAD[hd]; return {src:"seed", n:e.n, tm:{k:e.tm,p:e.ptm}, gm:{k:e.gm,p:e.pgm}, gc:{k:e.gc,p:e.pgc}} }
+ if(HEAD_CUR[hd]){ const c=HEAD_CUR[hd]; return {src:"curado", n:14, tm:{k:c[0],p:0.9}, gm:{k:c[1],p:0.9}, gc:{k:c[2],p:0.8}} }
+ if(hb && hb.n===1) return {src:"base", n:1, soft:true, tm:best(hb.tm), gm:best(hb.gm), gc:best(hb.gc)};
+ let bk=null,bn=0;
+ S.headBase.forEach(function(v,k){
+  if(v.n>bn && Math.min(k.length,hd.length)>=4 && (k.indexOf(hd)===0||hd.indexOf(k)===0)){bn=v.n;bk=k}
+ });
+ if(bk){ const v=S.headBase.get(bk); return {src:"base", soft:true, n:v.n, tm:best(v.tm), gm:best(v.gm), gc:best(v.gc), via:bk} }
+ for(const k in HEAD){ if(Math.min(k.length,hd.length)>=4 && (k.indexOf(hd)===0||hd.indexOf(k)===0) && HEAD[k].n>bn){bn=HEAD[k].n;bk=k} }
+ if(bk){ const e=HEAD[bk]; return {src:"seed", soft:true, n:e.n, tm:{k:e.tm,p:e.ptm}, gm:{k:e.gm,p:e.pgm}, gc:{k:e.gc,p:e.pgc}, via:bk} }
+ return null;
+}
+/* confianca calibrada por campo: evidencia do historico com encolhimento bayesiano,
+   sem punir o uso antes de carregar a planilha da base */
+function shrink(p,n,k){ n=n||0; return (p*n + 0.34*k)/(n+k) }
+function fieldConf(share, hl, f, maxSim, ev){
+ const val=[], wgt=[];
+ val.push(Math.max(0,Math.min(1,share||0))); wgt.push(1.0);
+ if(hl && hl[f] && hl[f].k){
+  const hp=shrink(hl[f].p, hl.n, 4)*(hl.soft?0.88:1);
+  val.push(hp); wgt.push(Math.min(2.8, 0.9+Math.log(1+hl.n)/1.6));
+ }
+ if(S.base.length && maxSim>0){ val.push(Math.min(1,maxSim/0.88)); wgt.push(1.3) }
+ let num=0,den=0; for(let i=0;i<val.length;i++){num+=val[i]*wgt[i];den+=wgt[i]}
+ if(!den) return 0.15;
+ const sup = 0.50 + 0.50*Math.max(0,Math.min(1, ev===undefined?1:ev)); /* sem evidencia real a confianca nao sobe */
+ return Math.max(0.05, Math.min(0.99, (num/den)*sup));
+}
+
+/* ================= REGRA DE IMOBILIZADO ================= */
+function checkImob(desc, longa){
+ const t = toks(desc); const full = norm(desc+" "+(longa||""));
+ const head = t.slice(0,2);
+ const hasPart = t.some(function(x){return IMOB.peca.indexOf(x)>=0});
+ for(let i=0;i<IMOB.excTok.length;i++){
+  const e=IMOB.excTok[i];
+  if(t.indexOf(e)>=0 && !hasPart) return {flag:true, lvl:"alto", why:"Excecao da norma: "+e+" e sempre imobilizado (Fluxo 304 / ZATI), independente do valor"};
+ }
+ for(let i=0;i<IMOB.bens.length;i++){
+  const b=IMOB.bens[i];
+  if(head.indexOf(b)>=0 && !hasPart) return {flag:true, lvl:"alto", why:"Bem duravel como item principal ("+b+"): vida util acima de 1 ano, avaliar Fluxo 304 / ZATI"};
+  if(new RegExp("(^| )"+b+"( |$)").test(full) && !hasPart && t.length<=4) return {flag:true, lvl:"medio", why:"Descricao aponta o bem completo ("+b+") e nao um componente: validar contra a regra de imobilizado"};
+ }
+ if(!hasPart && /COMPLETO|NOVO|UNIDADE COMPLETA|MONTADO/.test(full) && t.length<=5)
+  return {flag:true, lvl:"baixo", why:"Indicio de bem completo: confirmar se nao e imobilizado (Fluxo 304)"};
+ return {flag:false, lvl:"", why:""};
+}
+
+/* ================= CLASSIFICADOR ================= */
+function classify(desc, curta, longa){
+ const key = desc||curta||longa||"";
+ const t = toks(key+" "+(curta||""));
+ const nb = neighbors(key, curta, 18);
+
+ const vt={},vg={},vc={}; let wsum=0;
+
+ /* 1) vizinhos reais da base carregada */
+ for(let i=0;i<nb.length;i++){
+  const x=nb[i]; if(x.s<0.30) continue;
+  const w=Math.pow(x.s,3)*3;
+  wsum+=w;
+  if(x.r.tm) vt[x.r.tm]=(vt[x.r.tm]||0)+w;
+  if(x.r.gm) vg[x.r.gm]=(vg[x.r.gm]||0)+w;
+  if(x.r.gc) vc[x.r.gc]=(vc[x.r.gc]||0)+w;
+ }
+ /* 2) reforco das correcoes aprovadas por voce (peso maior que o historico bruto) */
+ for(let i=0;i<S.fb.length;i++){
+  const f=S.fb[i];
+  const s=diceSet(tri(key),tri(f.d));
+  if(s>0.72){ const w=9*s; wsum+=w;
+   if(f.tm) vt[f.tm]=(vt[f.tm]||0)+w;
+   if(f.gm) vg[f.gm]=(vg[f.gm]||0)+w;
+   if(f.gc) vc[f.gc]=(vc[f.gc]||0)+w;
+  }
+ }
+ /* 3) substantivo principal: prior mais forte do modelo (real, tirado da base 302) */
+ const hd = t[0]||"";
+ const hl = headLook(hd);
+ if(hl){
+  const w=Math.log(1+hl.n)*4.3*(hl.soft?0.6:1)*(hl.src==="curado"?1.3:1);
+  if(hl.tm.k) vt[hl.tm.k]=(vt[hl.tm.k]||0)+w*hl.tm.p;
+  if(hl.gm.k) vg[hl.gm.k]=(vg[hl.gm.k]||0)+w*hl.gm.p;
+  if(hl.gc.k) vc[hl.gc.k]=(vc[hl.gc.k]||0)+w*hl.gc.p;
+  wsum+=w;
+ }
+ /* 4) modificadores da descricao (lexico de tokens) */
+ let lexHit=0;
+ const uq=Array.from(new Set(t));
+ const posW=function(tk){const p=t.indexOf(tk); return p===0?1.2:(p===1?1.5:(p===2?1.1:0.9))};
+ uq.forEach(function(tk){
+  const w0=idf(tk)*posW(tk);
+  const L=lexLook(tk); if(!L) return;
+  const soft = L.soft?0.7:1;
+  lexHit += L.soft?0.6:1;
+  if(L.src==="base"){
+   const lb=L.e, bt2=best(lb.tm), bg2=best(lb.gm), bc2=best(lb.gc);
+   const w=w0*Math.log(1+lb.n)*0.55*soft;
+   if(bt2.k) vt[bt2.k]=(vt[bt2.k]||0)+w*bt2.p;
+   if(bg2.k) vg[bg2.k]=(vg[bg2.k]||0)+w*bg2.p;
+   if(bc2.k) vc[bc2.k]=(vc[bc2.k]||0)+w*bc2.p;
+   wsum+=w;
+  } else {
+   const e=L.e, w=w0*Math.log(1+e.n)*0.5*soft;
+   vt[e.tm]=(vt[e.tm]||0)+w*e.ptm;
+   vg[e.gm]=(vg[e.gm]||0)+w*e.pgm;
+   vc[e.gc]=(vc[e.gc]||0)+w*e.pgc;
+   wsum+=w;
+  }
+ });
+
+ const bt=best(vt), bg=best(vg), bc=best(vc);
+ let tm=bt.k||"HIBE", gm=bg.k||"90001", gc=bc.k||"MR1";
+ if(GM_IMOB.indexOf(gm)>=0) gm="90001"; /* GM de imobilizado nao pertence ao 302 */
+
+ const maxSim = nb.length? nb[0].s : 0;
+ const strongHits = uq.filter(function(x){const L=lexLook(x); return L&&!L.soft&&L.e&&(L.e.n||0)>=8}).length;
+ const cov = uq.length? strongHits/uq.length : 0;
+ const headSup = hl? Math.min(1, Math.log(1+hl.n)/3.5)*(hl.soft?0.55:1) : 0;
+ const ev = Math.min(1, 0.65*headSup + 0.35*cov + (S.base.length? 0.35*maxSim : 0));
+ let cTm=fieldConf(bt.p,hl,"tm",maxSim,ev), cGm=fieldConf(bg.p,hl,"gm",maxSim,ev), cGc=fieldConf(bc.p,hl,"gc",maxSim,ev);
+
+ /* prior dominante: substantivo com historico grande e alta pureza nao e derrubado por modificador */
+ if(hl && !hl.soft && hl.n>=30){
+  if(hl.tm.k && hl.tm.p>=0.75 && tm!==hl.tm.k){ tm=hl.tm.k; cTm=Math.max(cTm,fieldConf(hl.tm.p,hl,"tm",maxSim,ev)) }
+  if(hl.gm.k && hl.gm.p>=0.75 && gm!==hl.gm.k && GM_IMOB.indexOf(hl.gm.k)<0){ gm=hl.gm.k; cGm=Math.max(cGm,fieldConf(hl.gm.p,hl,"gm",maxSim,ev)) }
+  if(hl.gc.k && hl.gc.p>=0.75 && gc!==hl.gc.k){ gc=hl.gc.k; cGc=Math.max(cGc,fieldConf(hl.gc.p,hl,"gc",maxSim,ev)) }
+ }
+
+ /* regras determinísticas */
+ let ruleTxt="";
+ if(HEAD_NLAG.indexOf(hd)>=0 && tm!=="NLAG"){ tm="NLAG"; cTm=Math.max(cTm,0.9);
+  ruleTxt="regra: "+hd+" nao e item estocavel/palpavel, Tipo ajustado para NLAG"; }
+ const priorForte = !!(hl && !hl.soft && hl.n>=30 && hl.gm.p>=0.75);
+ if(HEAD_PART.indexOf(hd)>=0 && !(priorForte && GM_MANUT.indexOf(hl.gm.k)<0)){
+  if(GM_MANUT.indexOf(gm)<0){
+   let alt=null,bv=-1;
+   GM_MANUT.forEach(function(k){ if((vg[k]||0)>bv){bv=vg[k]||0;alt=k} });
+   if(!(bv>0)) alt=null;
+   if(!alt && hl && hl.gm.k && GM_MANUT.indexOf(hl.gm.k)>=0) alt=hl.gm.k;
+   if(!alt) alt="90001";
+   ruleTxt="regra: item principal e componente ("+hd+"), Grupo de Mercadoria ajustado de "+gm+" para "+alt;
+   gm=alt; cGm=Math.max(cGm,0.8);
+  }
+  if(tm==="HIBE" && hl && hl.tm.k==="ERSA" && hl.tm.p>=0.6){
+   tm="ERSA"; cTm=Math.max(cTm,0.82);
+   ruleTxt=(ruleTxt?ruleTxt+" | ":"")+"regra: "+hd+" e peca de reposicao no padrao da base, Tipo ajustado para ERSA";
+  }
+ }
+
+ /* EPI: substantivo de protecao individual + termo de seguranca => 90711 */
+ const EPI_HEAD=["LUVA","OCULOS","BOTINA","BOTA","MASCARA","PROTETOR","CAPACETE","RESPIRADOR","AVENTAL","TALABARTE","COLETE","CONCHA","JALECO","PERNEIRA","CAPUZ"];
+ const EPI_SIG=["SEGURANCA","EPI","VAQUETA","NITRILICA","NITRILICO","PFF2","PFF1","AURICULAR","BALACLAVA","RASPA","ANTICORTE","SOLDADOR","CA","ABAFADOR"];
+ if(EPI_HEAD.indexOf(hd)>=0 && t.some(function(x){return EPI_SIG.indexOf(x)>=0})){
+  if(gm!=="90711"){ ruleTxt=(ruleTxt?ruleTxt+" | ":"")+"regra: "+hd+" com indicacao de protecao individual, Grupo de Mercadoria ajustado de "+gm+" para 90711 (EPI'S)"; }
+  gm="90711"; cGm=Math.max(cGm,0.88);
+  if(tm!=="HIBE"){ tm="HIBE"; cTm=Math.max(cTm,0.85) }
+ }
+
+ /* gemeo praticamente identico na base: adota a classificacao ja cadastrada */
+ let twin=null;
+ if(maxSim>=0.95 && nb[0].r.tm){
+  twin=nb[0].r;
+  tm=twin.tm; if(twin.gm) gm=twin.gm; if(twin.gc) gc=twin.gc;
+  cTm=cGm=cGc=0.97;
+  ruleTxt=(ruleTxt?ruleTxt+" | ":"")+"material praticamente identico ja cadastrado ("+(twin.cod?twin.cod+" ":"")+twin.d+"): classificacao copiada do cadastro existente";
+ }
+ if(!wsum){ cTm=cGm=cGc=0.15 }
+
+ const imob = checkImob(key, longa);
+ let conf = 0.30*cTm + 0.40*cGm + 0.30*cGc;
+ if(imob.flag && imob.lvl==="alto") conf*=0.9;
+ conf = Math.max(0.05, Math.min(0.99, conf));
+
+ /* divergencia entre as tres descricoes */
+ let div="";
+ if(desc && curta){ const s=diceSet(tri(desc),tri(curta)); if(s<0.45) div="Descricao Curta divergente da Descricao do Material"; }
+ if(desc && longa){ const s2=diceSet(tri(desc),tri(longa)); if(s2<0.20 && norm(longa).length>12) div=(div?div+" e ":"")+"Descricao Longa pouco aderente"; }
+
+ /* duplicidade */
+ const dups = nb.filter(function(x){return x.s>=0.60}).slice(0,5).map(function(x){
+  const p=Math.round(x.s*100);
+  return {pct:p, d:x.r.d, cod:x.r.cod||"", tm:x.r.tm, gm:x.r.gm, gc:x.r.gc,
+          risk: p>=90?"provavel":(p>=75?"possivel":"improvavel")};
+ });
+
+ /* por que o modelo decidiu assim */
+ const why=[];
+ if(hl) why.push("substantivo principal "+(hl.via?hd+" tratado como "+hl.via:hd)+": "+hl.n+(hl.n>1?" materiais":" material")+" no historico da base 302, "+
+   Math.round(hl.tm.p*100)+"% "+hl.tm.k+" / "+Math.round(hl.gm.p*100)+"% "+hl.gm.k+" / "+Math.round(hl.gc.p*100)+"% "+hl.gc.k+
+   (hl.src==="base"?" (base carregada)":" (modelo embarcado)"));
+ else why.push("substantivo principal \""+hd+"\" nao existe no historico: classificacao por semelhanca, revisar antes de integrar");
+ if(nb.length && nb[0].s>=0.55) why.push("material mais parecido na base: "+nb[0].r.d+" ("+Math.round(nb[0].s*100)+"%)");
+ const strong = uq.filter(function(x){const L=lexLook(x); return L&&!L.soft&&L.e&&L.e.n>=8}).slice(0,4);
+ if(strong.length) why.push("termos que pesaram: "+strong.join(", "));
+ if(ruleTxt) why.push(ruleTxt);
+ if(!S.base.length) why.push("planilha da base ainda nao carregada: duplicidade limitada ao modelo embarcado");
+ const just = why.join(" | ");
+
+ /* regra central: o campo classificado guarda SEMPRE o codigo puro */
+ tm=codeOf("tm",tm); gm=codeOf("gm",gm); gc=codeOf("gc",gc);
+ if(!codeOk("tm",tm)) tm="HIBE";
+ if(!codeOk("gm",gm)) gm="90001";
+ if(!codeOk("gc",gc)) gc="MR1";
+
+ return {
+  desc:key, curta:curta||"", longa:longa||"",
+  tm:tm, gm:gm, gc:gc, gci: codeOf("gci", tm==="NLAG"?FIXOS.gciNlag:FIXOS.gci), setor: codeOf("setor",FIXOS.setor), aprovado: codeOf("aprovado",FIXOS.aprovado),
+  ref: nb.length? {cod:(nb[0].r.cod||""), d:nb[0].r.d, tm:codeOf("tm",nb[0].r.tm), gm:codeOf("gm",nb[0].r.gm), gc:codeOf("gc",nb[0].r.gc), sim:Math.round(nb[0].s*100)} : null,
+  head: hl? {tk:hd, n:hl.n, src:hl.src, soft:!!hl.soft, via:hl.via||"", tm:hl.tm.k, ptm:hl.tm.p, gm:hl.gm.k, pgm:hl.gm.p, gc:hl.gc.k, pgc:hl.gc.p} : {tk:hd, n:0, src:"nenhum"},
+  regra: ruleTxt||"",
+  conf:conf, cTm:cTm, cGm:cGm, cGc:cGc, hd:hd, hn:(hl?hl.n:0),
+  imob:imob, dups:dups, div:div, just:just, why:why,
+  flag: (imob.flag || conf<0.55 || (dups[0]&&dups[0].pct>=75) || !!div)
+ };
+}
+
+/* ================= PERSISTENCIA (IndexedDB) ================= */
+const DB={n:"mdm302",v:1,h:null};
+function db(){return new Promise(function(res,rej){
+ if(DB.h) return res(DB.h);
+ const rq=indexedDB.open(DB.n,DB.v);
+ rq.onupgradeneeded=function(e){const d=e.target.result;
+  if(!d.objectStoreNames.contains("kv")) d.createObjectStore("kv");
+ };
+ rq.onsuccess=function(e){DB.h=e.target.result;res(DB.h)};
+ rq.onerror=function(){rej(rq.error)};
+})}
+function kvSet(k,v){return db().then(function(d){return new Promise(function(res,rej){
+ const t=d.transaction("kv","readwrite");t.objectStore("kv").put(v,k);t.oncomplete=function(){res(true)};t.onerror=function(){rej(t.error)};
+})})}
+function kvGet(k){return db().then(function(d){return new Promise(function(res,rej){
+ const t=d.transaction("kv","readonly");const r=t.objectStore("kv").get(k);
+ r.onsuccess=function(){res(r.result)};r.onerror=function(){rej(r.error)};
+})})}
+
+function saveBase(){return kvSet("base",S.base.map(function(r){return {d:r.d,c:r.c,l:r.l,tm:r.tm,gm:r.gm,gc:r.gc,gci:r.gci,sa:r.sa,cod:r.cod}}))}
+function saveFb(){return kvSet("fb",S.fb)}
+function saveLog(){return kvSet("log",S.log.slice(-4000))}
+
+/* ================= LEITURA DE ARQUIVO (sem dependencia externa) ================= */
+function csvParse(txt){
+ const rows=[];let row=[],cell="",q=false;
+ txt=txt.replace(/^\uFEFF/,"");
+ const sep=(txt.split("\n")[0].split(";").length>txt.split("\n")[0].split(",").length)?";":",";
+ for(let i=0;i<txt.length;i++){
+  const c=txt[i];
+  if(q){ if(c==="\""){ if(txt[i+1]==="\""){cell+="\"";i++} else q=false } else cell+=c }
+  else if(c==="\""){q=true}
+  else if(c===sep){row.push(cell);cell=""}
+  else if(c==="\n"){row.push(cell);cell="";if(row.some(function(x){return String(x).trim()!==""}))rows.push(row);row=[]}
+  else if(c!=="\r"){cell+=c}
+ }
+ row.push(cell); if(row.some(function(x){return String(x).trim()!==""}))rows.push(row);
+ return rows;
+}
+function unxml(s){
+ return String(s==null?"":s)
+  .replace(/&#x([0-9a-fA-F]+);/g,function(_,h){return String.fromCodePoint(parseInt(h,16))})
+  .replace(/&#(\d+);/g,function(_,d){return String.fromCodePoint(+d)})
+  .replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,"\"").replace(/&apos;/g,"'").replace(/&#39;/g,"'").replace(/&amp;/g,"&");
+}
+async function inflateRaw(buf){
+ if(typeof DecompressionStream==="undefined") throw new Error("nav");
+ const ds=new DecompressionStream("deflate-raw");
+ const st=new Blob([buf]).stream().pipeThrough(ds);
+ return new Uint8Array(await new Response(st).arrayBuffer());
+}
+async function xlsxRead(ab){
+ const u=new Uint8Array(ab), dv=new DataView(ab);
+ let eo=-1;
+ for(let i=u.length-22;i>=Math.max(0,u.length-66000);i--){ if(dv.getUint32(i,true)===0x06054b50){eo=i;break} }
+ if(eo<0) throw new Error("zip");
+ const cnt=dv.getUint16(eo+10,true), cdo=dv.getUint32(eo+16,true);
+ let p=cdo; const files={};
+ const dec=new TextDecoder("utf-8");
+ for(let i=0;i<cnt;i++){
+  if(dv.getUint32(p,true)!==0x02014b50) break;
+  const method=dv.getUint16(p+10,true), csz=dv.getUint32(p+20,true);
+  const nl=dv.getUint16(p+28,true), el=dv.getUint16(p+30,true), cl=dv.getUint16(p+32,true);
+  const lho=dv.getUint32(p+42,true);
+  const name=dec.decode(u.subarray(p+46,p+46+nl));
+  const lnl=dv.getUint16(lho+26,true), lel=dv.getUint16(lho+28,true);
+  const start=lho+30+lnl+lel;
+  const raw=u.subarray(start,start+csz);
+  files[name]={method:method,raw:raw};
+  p+=46+nl+el+cl;
+ }
+ async function txt(nm){ const f=files[nm]; if(!f) return ""; const b=(f.method===0)?f.raw:await inflateRaw(f.raw); return dec.decode(b) }
+ const ss=[]; const sst=await txt("xl/sharedStrings.xml");
+ if(sst){ const m=sst.match(/<si[\s\S]*?<\/si>/g)||[]; m.forEach(function(si){
+   const ts=si.match(/<t[^>]*>([\s\S]*?)<\/t>/g)||[];
+   ss.push(unxml(ts.map(function(t){return t.replace(/<[^>]+>/g,"")}).join("")));
+ })}
+ let sheetName=null;
+ for(const k in files){ if(/^xl\/worksheets\/sheet\d+\.xml$/.test(k)){ if(!sheetName||k<sheetName) sheetName=k } }
+ const sx=await txt(sheetName||"xl/worksheets/sheet1.xml");
+ const rows=[];
+ const rw=sx.match(/<row[\s\S]*?<\/row>|<row[^>]*\/>/g)||[];
+ rw.forEach(function(r){
+  const cells=r.match(/<c[\s\S]*?<\/c>|<c[^>]*\/>/g)||[];
+  const out=[];
+  cells.forEach(function(c){
+   const ref=(c.match(/r="([A-Z]+)\d+"/)||[])[1]||"";
+   let ci=0; for(let i=0;i<ref.length;i++) ci=ci*26+(ref.charCodeAt(i)-64);
+   ci=ci?ci-1:out.length;
+   const ty=(c.match(/t="([^"]+)"/)||[])[1]||"n";
+   let v="";
+   if(ty==="inlineStr"){ const t=c.match(/<t[^>]*>([\s\S]*?)<\/t>/); v=t?t[1]:"" }
+   else { const m=c.match(/<v>([\s\S]*?)<\/v>/); v=m?m[1]:""; if(ty==="s") v=ss[+v]||"" }
+   v=unxml(v);
+   while(out.length<ci) out.push("");
+   out[ci]=v;
+  });
+  if(out.some(function(x){return String(x).trim()!==""})) rows.push(out);
+ });
+ return rows;
+}
+async function readAny(f){
+ const nm=f.name.toLowerCase();
+ if(nm.endsWith(".xlsx")) return await xlsxRead(await f.arrayBuffer());
+ return csvParse(await f.text());
+}
+
+/* ================= ESCRITA XLSX (nativa) ================= */
+const CRCT=(function(){const t=[];for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=(c&1)?(0xEDB88320^(c>>>1)):(c>>>1);t[n]=c>>>0}return t})();
+function crc32(u){let c=0^-1;for(let i=0;i<u.length;i++)c=(c>>>8)^CRCT[(c^u[i])&0xFF];return (c^-1)>>>0}
+function xlsxWrite(sheetRows, sheetTitle){
+ const enc=new TextEncoder();
+ function esx(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+ let sd="";
+ sheetRows.forEach(function(r,ri){
+  sd+="<row r=\""+(ri+1)+"\">";
+  r.forEach(function(v,ci){
+   let ref=""; let n=ci+1; while(n>0){const m=(n-1)%26;ref=String.fromCharCode(65+m)+ref;n=Math.floor((n-1)/26)}
+   sd+="<c r=\""+ref+(ri+1)+"\" t=\"inlineStr\"><is><t xml:space=\"preserve\">"+esx(v)+"</t></is></c>";
+  });
+  sd+="</row>";
+ });
+ const files=[
+  ["[Content_Types].xml","<?xml version=\"1.0\" encoding=\"UTF-8\"?><Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\"><Default Extension=\"rels\" ContentType=\"application/vnd.openxmlformats-package.relationships+xml\"/><Default Extension=\"xml\" ContentType=\"application/xml\"/><Override PartName=\"/xl/workbook.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml\"/><Override PartName=\"/xl/worksheets/sheet1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml\"/></Types>"],
+  ["_rels/.rels","<?xml version=\"1.0\" encoding=\"UTF-8\"?><Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument\" Target=\"xl/workbook.xml\"/></Relationships>"],
+  ["xl/workbook.xml","<?xml version=\"1.0\" encoding=\"UTF-8\"?><workbook xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\"><sheets><sheet name=\""+esx(sheetTitle||"Resultado").substr(0,31)+"\" sheetId=\"1\" r:id=\"rId1\"/></sheets></workbook>"],
+  ["xl/_rels/workbook.xml.rels","<?xml version=\"1.0\" encoding=\"UTF-8\"?><Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet\" Target=\"worksheets/sheet1.xml\"/></Relationships>"],
+  ["xl/worksheets/sheet1.xml","<?xml version=\"1.0\" encoding=\"UTF-8\"?><worksheet xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\"><sheetData>"+sd+"</sheetData></worksheet>"]
+ ];
+ const chunks=[],cd=[]; let off=0;
+ files.forEach(function(f){
+  const nb=enc.encode(f[0]), db2=enc.encode(f[1]);
+  const cr=crc32(db2);
+  const lh=new Uint8Array(30+nb.length), lv=new DataView(lh.buffer);
+  lv.setUint32(0,0x04034b50,true); lv.setUint16(4,20,true); lv.setUint16(6,0,true); lv.setUint16(8,0,true);
+  lv.setUint16(10,0,true); lv.setUint16(12,0,true); lv.setUint32(14,cr,true);
+  lv.setUint32(18,db2.length,true); lv.setUint32(22,db2.length,true);
+  lv.setUint16(26,nb.length,true); lv.setUint16(28,0,true);
+  lh.set(nb,30);
+  chunks.push(lh,db2);
+  const ch=new Uint8Array(46+nb.length), cv=new DataView(ch.buffer);
+  cv.setUint32(0,0x02014b50,true); cv.setUint16(4,20,true); cv.setUint16(6,20,true);
+  cv.setUint16(8,0,true); cv.setUint16(10,0,true); cv.setUint16(12,0,true); cv.setUint16(14,0,true);
+  cv.setUint32(16,cr,true); cv.setUint32(20,db2.length,true); cv.setUint32(24,db2.length,true);
+  cv.setUint16(28,nb.length,true); cv.setUint16(30,0,true); cv.setUint16(32,0,true);
+  cv.setUint16(34,0,true); cv.setUint16(36,0,true); cv.setUint32(38,0,true); cv.setUint32(42,off,true);
+  ch.set(nb,46); cd.push(ch);
+  off += lh.length + db2.length;
+ });
+ let cdl=0; cd.forEach(function(c){cdl+=c.length});
+ const eo=new Uint8Array(22), ev=new DataView(eo.buffer);
+ ev.setUint32(0,0x06054b50,true); ev.setUint16(8,cd.length,true); ev.setUint16(10,cd.length,true);
+ ev.setUint32(12,cdl,true); ev.setUint32(16,off,true);
+ return new Blob(chunks.concat(cd,[eo]),{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+}
+function download(blob,name){
+ const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=name;
+ document.body.appendChild(a); a.click(); setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},1500);
+}
+function dlCsv(rows,name){
+ const t=rows.map(function(r){return r.map(function(c){const s=String(c==null?"":c);return /[";\n]/.test(s)?"\""+s.replace(/"/g,"\"\"")+"\"":s}).join(";")}).join("\r\n");
+ download(new Blob(["\uFEFF"+t],{type:"text/csv;charset=utf-8"}),name);
+}
+
+/* ================= MAPEAMENTO DE COLUNAS ================= */
+function mapCols(head){
+ const h=head.map(function(x){return norm(x)});
+ const find=function(fn){for(let i=0;i<h.length;i++) if(fn(h[i])) return i; return -1};
+ const iCurta=find(function(x){return /CURTA|SANEAD/.test(x)});
+ const iLonga=find(function(x){return /LONGA|PADRONIZAD/.test(x)});
+ let iDesc=find(function(x){return /DESCR/.test(x) && !/CURTA|LONGA|SANEAD|PADRONIZAD/.test(x)});
+ if(iDesc<0) iDesc=find(function(x){return /MATERIAL|ITEM|SOLICITAD|TEXTO/.test(x) && !/TIPO|CODIGO/.test(x)});
+ if(iDesc<0) iDesc = iCurta>=0?iCurta:0;
+ return {
+  d:iDesc, c:iCurta, l:iLonga,
+  tm:find(function(x){return /TIPO/.test(x)}),
+  gm:find(function(x){return /MERCADORIA/.test(x)}),
+  gc:find(function(x){return /COMPRADOR/.test(x)}),
+  gci:find(function(x){return /CATEGORIA/.test(x)}),
+  sa:find(function(x){return /SETOR/.test(x)}),
+  cod:find(function(x){return /^(CODIGO|COD|MATERIAL|SAP|NUMERO)/.test(x) && !/DESCR/.test(x)})
+ };
+}
+function looksHeader(r){ return r.some(function(c){return /DESCR|TIPO|MERCADORIA|COMPRADOR|MATERIAL/.test(norm(c))}) }
+
+/* ================= RENDER ================= */
+function cCls(v){ return v>=0.80?"ok":(v>=0.60?"wa":"ri") }
+function cHex(v){ return v>=0.80?"#1a7f4b":(v>=0.60?"#9a6b00":"#b3261e") }
+function pctTag(p){ return "<span class=\"tag "+cCls(p)+"\">"+Math.round(p*100)+"%</span>" }
+function tmDesc(c){ const t=TIPOS.filter(function(x){return x[0]===c})[0]; return t?t[1]:"" }
+function gmDesc(c){ return GM[c]||"" }
+function gcDesc(c){ return GC[c]||"" }
+function catNote(f,c){
+ if(f==="gm"){ if(FORA663.indexOf(c)>=0) return "codigo do historico 302, nao consta no catalogo 663 atual"; if(!GM[c]) return "codigo sem descricao no catalogo 663"; return "" }
+ if(f==="gc"){ if(FORA627.indexOf(c)>=0) return "codigo do historico 302, nao consta no catalogo 627 atual"; if(!GC[c]) return "codigo sem descricao no catalogo 627"; return "" }
+ return "";
+}
+function fldVal(r,f){ return f==="tm"?r.tm:(f==="gm"?r.gm:(f==="gc"?r.gc:(f==="gci"?r.gci:(f==="setor"?r.setor:r.aprovado)))) }
+function fldDesc(f,c){ return f==="tm"?tmDesc(c):(f==="gm"?gmDesc(c):(f==="gc"?gcDesc(c):"padrao fixo do fluxo 302")) }
+function optList(f,cur){
+ let ks=[];
+ if(f==="tm") ks=TIPOS.map(function(t){return [t[0],t[1]]});
+ if(f==="gm") ks=Object.keys(GM).filter(function(k){return GM_IMOB.indexOf(k)<0}).map(function(k){return [k,GM[k]]});
+ if(f==="gc") ks=Object.keys(GC).map(function(k){return [k,GC[k]]});
+ if(f==="gci") ks=GCI_OPC.map(function(k){return [k,k==="NORM"?"padrao do fluxo 302":"item nao estocavel"]});
+ if(f==="setor") ks=SETOR_OPC.map(function(k){return [k,k==="80"?"padrao do fluxo 302":"outro setor visto no historico"]});
+ if(f==="aprovado") ks=[[FIXOS.aprovado,"padrao do fluxo 302"],["PENDENTE","aguardando aprovacao"]];
+ if(cur && !ks.some(function(x){return x[0]===cur})) ks.unshift([cur,"valor atual"]);
+ return ks.map(function(x){return "<option value=\""+esc(x[0])+"\""+(x[0]===cur?" selected":"")+">"+esc(x[0]+(x[1]?" - "+x[1]:""))+"</option>"}).join("");
+}
+function fldHtml(i,f,label,code,desc,conf,fixed){
+ const note=catNote(f,code);
+ let h="<div class=\"fld"+(fixed?" fix":"")+"\" data-i=\""+i+"\" data-f=\""+f+"\">";
+ h+="<span class=\"fl\">"+esc(label)+"</span>";
+ h+="<span class=\"fc\">"+esc(code)+"</span>";
+ h+="<span class=\"fd\">"+esc(desc||note||"sem descricao no catalogo")+"</span>";
+ if(note && desc) h+="<span class=\"fd\" style=\"color:#9a6b00\">"+esc(note)+"</span>";
+ h+="<span class=\"fx\">";
+ h+= (conf===null||conf===undefined) ? "<span class=\"cf ok\">padrao pre-preenchido</span>"
+                                    : "<span class=\"cf "+cCls(conf)+"\">confianca "+Math.round(conf*100)+"%</span>";
+ h+="<button class=\"btn gho fedit\">editar</button></span>";
+ h+="</div>";
+ return h;
+}
+function dupsHtml(r){
+ if(!r.dups.length) return "";
+ let h="<div style=\"margin-top:12px\"><b style=\"font-size:13px\">Materiais parecidos ja cadastrados</b><div class=\"tw\"><table><thead><tr><th>%</th><th>Risco</th><th>Codigo SAP</th><th>Material</th><th>Classificacao atual</th></tr></thead><tbody>";
+ r.dups.forEach(function(d){
+  h+="<tr><td class=\"mono\"><b>"+d.pct+"%</b></td><td><span class=\"tag "+(d.pct>=90?"ri":(d.pct>=75?"wa":""))+"\">"+d.risk+"</span></td><td class=\"mono\">"+esc(d.cod||"-")+"</td><td>"+esc(d.d)+"</td><td class=\"mono\">"+esc([d.tm,d.gm,d.gc].filter(Boolean).join(" / "))+"</td></tr>";
+ });
+ return h+"</tbody></table></div></div>";
+}
+function fldLabel(f){ return {tm:"Tipo de Material",gm:"Grupo de Mercadoria",gc:"Grupo de Compradores",gci:"Grupo Categoria Item",setor:"Setor de Atividade",aprovado:"Cadastro aprovado?"}[f] }
+function origem(r,f){
+ if(f==="gci"||f==="setor"||f==="aprovado") return "valor fixo do fluxo 302, pre-preenchido sem sugestao";
+ const hd=r.head||{tk:"",n:0}, parts=[];
+ if(hd.n){
+  const p = f==="tm"?hd.ptm:(f==="gm"?hd.pgm:hd.pgc);
+  const k = f==="tm"?hd.tm:(f==="gm"?hd.gm:hd.gc);
+  parts.push("substantivo \""+(hd.via||hd.tk)+"\": "+hd.n+" registro(s) do historico 302, "+Math.round((p||0)*100)+"% com "+k+
+   (hd.src==="base"?" (planilha carregada)":(hd.src==="curado"?" (lista curada)":" (modelo embarcado da base 302)")));
+ } else parts.push("sem historico para o substantivo \""+(hd.tk||"?")+"\"");
+ if(r.ref) parts.push("registro de referencia: "+(r.ref.cod?r.ref.cod+" - ":"")+r.ref.d+" ("+r.ref.sim+"% de semelhanca, cadastrado como "+[r.ref.tm,r.ref.gm,r.ref.gc].filter(Boolean).join(" / ")+")");
+ if(r.regra) parts.push(r.regra);
+ return parts.join("  |  ");
+}
+function transpHtml(r){
+ const fs=[["tm",r.tm,r.cTm],["gm",r.gm,r.cGm],["gc",r.gc,r.cGc],["gci",r.gci,null],["setor",r.setor,null],["aprovado",r.aprovado,null]];
+ let h="<details style=\"margin-top:12px\"><summary>painel de transparencia - de onde veio cada codigo (nao vai para a exportacao)</summary><div>";
+ h+="<div class=\"tw\"><table><thead><tr><th>Campo</th><th>Codigo exportado</th><th>Descricao (so leitura)</th><th>Catalogo de origem</th><th>Confianca</th><th>Como o motor chegou nesse codigo</th></tr></thead><tbody>";
+ fs.forEach(function(x){
+  h+="<tr><td>"+esc(fldLabel(x[0]))+"</td><td><span class=\"cd\">"+esc(String(x[1]))+"</span></td><td>"+esc(fldDesc(x[0],x[1])||catNote(x[0],x[1])||"-")+"</td>"+
+     "<td><span class=\"cx\">"+esc(CAT_SRC[x[0]])+"</span></td>"+
+     "<td>"+(x[2]===null?"<span class=\"tag ok\">fixo</span>":"<b style=\"color:"+cHex(x[2])+"\">"+Math.round(x[2]*100)+"%</b>")+"</td>"+
+     "<td><span class=\"cx\">"+esc(origem(r,x[0]))+"</span></td></tr>";
+ });
+ h+="</tbody></table></div><div class=\"hint\" style=\"margin-top:8px\">A planilha exportada leva apenas a coluna Codigo exportado. Descricao, catalogo, confianca e origem ficam somente nesta tela.</div></div></details>";
+ return h;
+}
+function transpAllHtml(){
+ const lim=300, rs=S.results.slice(0,lim);
+ let h="<details style=\"margin-top:14px\"><summary>painel de transparencia do lote - origem do codigo por material (nao vai para a exportacao)</summary><div>";
+ h+="<div class=\"tw\"><table><thead><tr><th>#</th><th>Material</th><th>Codigos exportados</th><th>Descricoes (so leitura)</th><th>Confianca por campo</th><th>Origem da decisao</th></tr></thead><tbody>";
+ rs.forEach(function(r,i){
+  h+="<tr><td class=\"mono\">"+(i+1)+"</td><td>"+esc(r.desc)+"</td>"+
+     "<td><span class=\"cd\">"+esc(r.tm+" / "+r.gm+" / "+r.gc+" / "+r.gci+" / "+r.setor)+"</span></td>"+
+     "<td><span class=\"cx\">"+esc([tmDesc(r.tm),gmDesc(r.gm)||catNote("gm",r.gm),gcDesc(r.gc)||catNote("gc",r.gc)].filter(Boolean).join(" | "))+"</span></td>"+
+     "<td><span class=\"cx\">tipo "+Math.round(r.cTm*100)+"% | mercadoria "+Math.round(r.cGm*100)+"% | compradores "+Math.round(r.cGc*100)+"%</span></td>"+
+     "<td><span class=\"cx\">"+esc(origem(r,"gm"))+"</span></td></tr>";
+ });
+ h+="</tbody></table></div>";
+ if(S.results.length>lim) h+="<div class=\"hint\" style=\"margin-top:8px\">mostrando os "+lim+" primeiros de "+S.results.length+" materiais; a analise completa em XLSX traz todos.</div>";
+ h+="</div></details>";
+ return h;
+}
+function cardHtml(r,i){
+ const pc=Math.round(r.conf*100);
+ let h="<div class=\"card\" style=\"margin-bottom:14px\">";
+ h+="<div style=\"margin-bottom:12px\"><span class=\"fl\" style=\"font-size:10.5px;color:#5b6675;text-transform:uppercase;letter-spacing:.6px;font-weight:700\">Material analisado</span><div style=\"font-size:16px;font-weight:700\">"+esc(r.desc)+"</div></div>";
+ h+="<div class=\"gconf\"><span class=\"gv "+cCls(r.conf)+"\">"+pc+"%</span><div class=\"gb\"><b>confianca global da classificacao</b>"+
+    "<div class=\"bar\" style=\"margin:6px 0\"><i style=\"width:"+pc+"%;background:"+cHex(r.conf)+"\"></i></div>"+
+    "<span class=\"hint\">"+(r.conf>=0.80?"pode seguir para o cadastro":(r.conf>=0.60?"confira os campos em amarelo antes de integrar":"revisao obrigatoria antes de integrar"))+"</span></div></div>";
+ h+="<div class=\"fldgrid\" style=\"margin-top:14px\">";
+ h+=fldHtml(i,"tm","Tipo de Material",r.tm,tmDesc(r.tm),r.cTm,false);
+ h+=fldHtml(i,"gm","Grupo de Mercadoria",r.gm,gmDesc(r.gm),r.cGm,false);
+ h+=fldHtml(i,"gc","Grupo de Compradores",r.gc,gcDesc(r.gc),r.cGc,false);
+ h+=fldHtml(i,"gci","Grupo Categoria Item",r.gci,"padrao fixo do fluxo 302",null,true);
+ h+=fldHtml(i,"setor","Setor de Atividade",r.setor,"padrao fixo do fluxo 302",null,true);
+ h+=fldHtml(i,"aprovado","Cadastro aprovado?",r.aprovado,"padrao fixo do fluxo 302",null,true);
+ h+="</div>";
+ if(r.imob.flag) h+="<div class=\"note "+(r.imob.lvl==="alto"?"ri":"wa")+"\" style=\"margin-top:12px\"><b>Possivel Imobilizado - avaliar Fluxo 304/ZATI.</b> "+esc(r.imob.why)+"</div>";
+ if(r.div) h+="<div class=\"note wa\" style=\"margin-top:10px\">"+esc(r.div)+"</div>";
+ h+=dupsHtml(r);
+ h+=transpHtml(r);
+ h+="<details style=\"margin-top:12px\"><summary>por que essa classificacao e essa confianca</summary><div><ul style=\"margin:0 0 0 18px;padding:0;font-size:12.5px;color:#46525f\">"+
+    (r.why||[r.just]).map(function(x){return "<li style=\"margin-bottom:4px\">"+esc(x)+"</li>"}).join("")+"</ul></div></details>";
+ h+="</div>";
+ return h;
+}
+function kpiHtml(rows){
+ const n=rows.length, ex=rows.filter(function(r){return r.flag}).length;
+ const im=rows.filter(function(r){return r.imob.flag}).length;
+ const dp=rows.filter(function(r){return r.dups[0]&&r.dups[0].pct>=75}).length;
+ const lc=rows.filter(function(r){return r.conf<0.60}).length;
+ const avg=n?Math.round(rows.reduce(function(a,r){return a+r.conf},0)/n*100):0;
+ return "<div class=\"grid g3\" style=\"margin-bottom:14px\">"+
+  "<div class=\"kpi\"><b>"+n+"</b><span>materiais analisados</span></div>"+
+  "<div class=\"kpi\"><b style=\"color:"+cHex(avg/100)+"\">"+avg+"%</b><span>confianca media</span></div>"+
+  "<div class=\"kpi\"><b style=\"color:#9a6b00\">"+im+"</b><span>alerta de imobilizado</span></div>"+
+  "<div class=\"kpi\"><b style=\"color:#b3261e\">"+dp+"</b><span>duplicidade provavel/possivel</span></div>"+
+  "<div class=\"kpi\"><b>"+lc+"</b><span>confianca abaixo de 60%</span></div>"+
+  "<div class=\"kpi\"><b>"+(n-ex)+"</b><span>prontos sem revisao</span></div></div>";
+}
+function cdCell(f,code,conf){
+ const d=fldDesc(f,code), note=catNote(f,code);
+ let h="<span class=\"cd\">"+esc(code)+"</span>";
+ h+="<span class=\"cx\">"+esc(d||note||"sem descricao no catalogo")+"</span>";
+ if(conf!==null&&conf!==undefined) h+="<span class=\"cx\" style=\"color:"+cHex(conf)+";font-weight:700\">"+Math.round(conf*100)+"%</span>";
+ return h;
+}
+function tableHtml(rows,onlyFlag){
+ let h="<div class=\"tw\"><table><thead><tr><th>#</th><th>Material</th><th>Tipo de Material</th><th>Grupo de Mercadoria</th><th>Grupo de Compradores</th><th>Cat. Item</th><th>Setor</th><th>Confianca</th><th>Imobilizado</th><th>Duplicidade</th><th></th></tr></thead><tbody>";
+ let shown=0;
+ rows.forEach(function(r,i){
+  if(onlyFlag && !r.flag) return;
+  shown++;
+  const d=r.dups[0];
+  h+="<tr>"+
+   "<td class=\"mono\">"+(i+1)+"</td>"+
+   "<td>"+esc(r.desc)+(r.div?"<span class=\"cx\" style=\"color:#9a6b00\">"+esc(r.div)+"</span>":"")+"</td>"+
+   "<td>"+cdCell("tm",r.tm,r.cTm)+"</td>"+
+   "<td>"+cdCell("gm",r.gm,r.cGm)+"</td>"+
+   "<td>"+cdCell("gc",r.gc,r.cGc)+"</td>"+
+   "<td><span class=\"cd\">"+esc(r.gci)+"</span></td>"+
+   "<td><span class=\"cd\">"+esc(r.setor)+"</span></td>"+
+   "<td><b style=\"color:"+cHex(r.conf)+"\">"+Math.round(r.conf*100)+"%</b></td>"+
+   "<td>"+(r.imob.flag?"<span class=\"tag "+(r.imob.lvl==="alto"?"ri":"wa")+"\">"+r.imob.lvl+"</span>":"<span class=\"tag ok\">nao</span>")+"</td>"+
+   "<td>"+(d?"<span class=\"tag "+(d.pct>=90?"ri":(d.pct>=75?"wa":""))+"\">"+d.pct+"% "+d.risk+"</span><span class=\"cx\">"+esc((d.cod?d.cod+" - ":"")+d.d)+"</span>":"<span class=\"tag ok\">nenhuma</span>")+"</td>"+
+   "<td><button class=\"btn gho rowopen\" data-i=\""+i+"\">abrir</button></td>"+
+   "</tr>";
+ });
+ if(!shown) h+="<tr><td colspan=\"11\" class=\"hint\">nenhum item nesse filtro</td></tr>";
+ return h+"</tbody></table></div>";
+}
+function renderOut(){
+ const box=$("#out");
+ if(!S.results.length){ box.innerHTML="<div class=\"empty\">Nenhum material analisado ainda. Comece pelo passo 1.</div>"; return }
+ const oe=$("#onlyEx").checked;
+ if(S.results.length===1) box.innerHTML=cardHtml(S.results[0],0);
+ else box.innerHTML=kpiHtml(S.results)+"<div id=\"detail\"></div>"+tableHtml(S.results,oe)+transpAllHtml();
+ bindOut(); buildTsv();
+}
+function bindOut(){
+ $$("#out .fedit").forEach(function(b){ b.onclick=function(){ openEdit(b.closest(".fld")) } });
+ $$("#out .rowopen").forEach(function(b){ b.onclick=function(){
+  const i=+b.dataset.i, dv=$("#detail");
+  dv.innerHTML=cardHtml(S.results[i],i); bindOut();
+  dv.scrollIntoView({behavior:"smooth",block:"nearest"});
+ }});
+}
+function openEdit(el){
+ const i=+el.dataset.i, f=el.dataset.f, r=S.results[i], cur=fldVal(r,f);
+ el.innerHTML="<span class=\"fl\">"+esc(el.querySelector(".fl")?el.querySelector(".fl").textContent:"")+"</span>";
+ const lbl={tm:"Tipo de Material",gm:"Grupo de Mercadoria",gc:"Grupo de Compradores",gci:"Grupo Categoria Item",setor:"Setor de Atividade",aprovado:"Cadastro aprovado?"}[f];
+ el.innerHTML="<span class=\"fl\">"+esc(lbl)+"</span><select class=\"esel\">"+optList(f,cur)+"</select>"+
+  "<span class=\"fx\"><button class=\"btn esave\">salvar</button><button class=\"btn gho ecanc\">cancelar</button></span>";
+ el.querySelector(".esave").onclick=function(){ applyEdit(i,f,el.querySelector(".esel").value) };
+ el.querySelector(".ecanc").onclick=function(){ renderOut() };
+}
+function applyEdit(i,f,v){
+ const r=S.results[i];
+ v=codeOf(f,v);
+ if(f==="tm"){ r.tm=v; r.cTm=0.99; r.gci = codeOf("gci", v==="NLAG"?FIXOS.gciNlag:FIXOS.gci) }
+ else if(f==="gm"){ r.gm=v; r.cGm=0.99 }
+ else if(f==="gc"){ r.gc=v; r.cGc=0.99 }
+ else if(f==="gci") r.gci=v;
+ else if(f==="setor") r.setor=v;
+ else if(f==="aprovado") r.aprovado=v;
+ r.conf = 0.30*r.cTm + 0.40*r.cGm + 0.30*r.cGc;
+ r.flag = r.imob.flag || r.conf<0.60 || (r.dups[0]&&r.dups[0].pct>=75) || !!r.div;
+ if(f==="tm"||f==="gm"||f==="gc"){
+  S.fb.push({d:r.desc,tm:r.tm,gm:r.gm,gc:r.gc,t:Date.now()}); saveFb();
+  S.log.push({t:Date.now(),d:r.desc,tm:r.tm,gm:r.gm,gc:r.gc,conf:Math.round(r.conf*100),src:"usuario",ev:"correcao aprendida ("+f+" = "+v+")"});
+  toast("correcao registrada e aprendida");
+ } else {
+  S.log.push({t:Date.now(),d:r.desc,tm:r.tm,gm:r.gm,gc:r.gc,conf:Math.round(r.conf*100),src:"usuario",ev:"ajuste manual ("+f+" = "+v+")"});
+  toast("campo ajustado");
+ }
+ saveLog(); renderLog(); renderOut();
+}
+
+/* ================= FLUXO DE ANALISE ================= */
+function expCell(f,v){ const c=codeOf(f,v); return (f==="setor"||f==="gm")? (/^\d+$/.test(c)? Number(c) : c) : c }
+function rows4mdg(skipEx){
+ const out=[COLS4MDG.slice()];
+ S.results.forEach(function(r){
+  if(skipEx && r.flag) return;
+  /* somente codigo em cada coluna de classificacao - nenhuma descricao, nenhuma concatenacao */
+  out.push([ String(r.desc||"").trim(),
+             expCell("tm",r.tm),
+             expCell("gm",r.gm),
+             expCell("gc",r.gc),
+             expCell("gci",r.gci),
+             expCell("setor",r.setor),
+             expCell("aprovado",r.aprovado) ]);
+ });
+ return out;
+}
+/* auditoria da exportacao: garante que nenhuma celula de classificacao levou descricao */
+function auditExport(skipEx){
+ const rs=rows4mdg(skipEx), fs=["tm","gm","gc","gci","setor","aprovado"], bad=[];
+ for(let i=1;i<rs.length;i++){
+  for(let k=0;k<fs.length;k++){
+   const v=String(rs[i][k+1]);
+   if(!codeOk(fs[k],codeOf(fs[k],v)) || /[a-z]/.test(v) || v.indexOf(" ")>=0 || v.indexOf("-")>=0)
+    bad.push({linha:i, campo:COLS4MDG[k+1], valor:v});
+  }
+ }
+ return {total:rs.length-1, bad:bad};
+}
+function rowsFull(){
+ const out=[["Descricao analisada","Descricao curta","Tipo de material","Descricao do tipo","Grupo de Mercadorias","Descricao do grupo de mercadorias","Grupo de compradores","Descricao do grupo de compradores","Grupo categoria Item","Setor de atividade","Cadastro aprovado?","Confianca tipo %","Confianca grupo mercadoria %","Confianca grupo compradores %","Confianca global %","Alerta imobilizado","Motivo imobilizado","Duplicidade %","Risco","Material candidato","Divergencia descricoes","Justificativa"]];
+ S.results.forEach(function(r){
+  const d=r.dups[0];
+  out.push([r.desc,r.curta,codeOf("tm",r.tm),tmDesc(r.tm),codeOf("gm",r.gm),gmDesc(r.gm),codeOf("gc",r.gc),gcDesc(r.gc),codeOf("gci",r.gci),codeOf("setor",r.setor),codeOf("aprovado",r.aprovado),
+            Math.round(r.cTm*100),Math.round(r.cGm*100),Math.round(r.cGc*100),Math.round(r.conf*100),
+            r.imob.flag?"SIM":"NAO", r.imob.why, d?d.pct:"", d?d.risk:"", d?((d.cod?d.cod+" - ":"")+d.d):"", r.div, r.just]);
+ });
+ return out;
+}
+function buildTsv(){
+ const sk=$("#skipEx")?$("#skipEx").checked:false;
+ $("#tsv").value = rows4mdg(sk).map(function(r){return r.join("\t")}).join("\n");
+}
+function needResults(){ if(!S.results.length){toast("analise algum material primeiro");return false} return true }
+function copyTsv(withHead){
+ if(!needResults()) return;
+ const rs=rows4mdg($("#skipEx").checked); const data=withHead?rs:rs.slice(1);
+ const txt=data.map(function(r){return r.join("\t")}).join("\n");
+ (navigator.clipboard?navigator.clipboard.writeText(txt):Promise.reject()).then(function(){toast((data.length-(withHead?1:0))+" linhas copiadas no layout do cadastro em massa")},
+  function(){const ta=$("#tsv");ta.value=txt;ta.select();document.execCommand("copy");toast("copiado")});
+}
+function logResults(ev){
+ S.results.forEach(function(r){ S.log.push({t:Date.now(),d:r.desc,tm:r.tm,gm:r.gm,gc:r.gc,conf:Math.round(r.conf*100),src:"IA",ev:ev}) });
+ saveLog(); renderLog();
+}
+function analyzeList(items){
+ const box=$("#out");
+ box.innerHTML="<div class=\"sk\" style=\"width:40%\"></div><div class=\"sk\" style=\"width:100%;margin-top:10px\"></div><div class=\"sk\" style=\"width:92%;margin-top:8px\"></div>";
+ const out=[]; let i=0;
+ return new Promise(function(res){
+  function step(){
+   const t0=performance.now();
+   while(i<items.length && performance.now()-t0<80){
+    const it=items[i++]; if(!it.d && !it.c) continue;
+    out.push(classify(it.d,it.c,it.l));
+   }
+   if(i<items.length){
+    box.innerHTML="<div class=\"row\"><b>"+i+" de "+items.length+"</b> analisados</div><div class=\"bar\"><i style=\"width:"+Math.round(i/items.length*100)+"%\"></i></div>";
+    setTimeout(step,0);
+   } else {
+    S.results=out; renderOut(); logResults("analise em lote"); res(out);
+   }
+  }
+  setTimeout(step,10);
+ });
+}
+/* ================= BASE ================= */
+function setBaseState(){
+ const n=S.base.length;
+ $("#baseDot").className = "dot"+(n?"":" off");
+ $("#baseTxt").textContent = n? (n.toLocaleString("pt-BR")+" materiais na base") : "base nao carregada";
+ const tks=S.lexBase.size;
+ $("#baseKpis").innerHTML =
+  "<div class=\"kpi\"><b>"+n.toLocaleString("pt-BR")+"</b><span>materiais na base</span></div>"+
+  "<div class=\"kpi\"><b>"+tks.toLocaleString("pt-BR")+"</b><span>termos aprendidos</span></div>"+
+  "<div class=\"kpi\"><b>"+S.fb.length+"</b><span>correcoes suas</span></div>"+
+  "<div class=\"kpi\"><b>"+S.log.length+"</b><span>registros no log</span></div>";
+}
+async function loadBaseFile(f, append){
+ toast("lendo arquivo...");
+ const rows=await readAny(f);
+ if(!rows.length) return toast("arquivo vazio");
+ const head=looksHeader(rows[0])?rows[0]:null;
+ const m=mapCols(head||rows[0].map(function(_,i){return "c"+i}));
+ const data=head?rows.slice(1):rows;
+ const recs=[];
+ data.forEach(function(r){
+  const d=(r[m.d]||"").toString().trim(); if(!d) return;
+  recs.push({d:d, c:(m.c>=0?r[m.c]:"")||"", l:(m.l>=0?r[m.l]:"")||"",
+   tm:codeSafe("tm", m.tm>=0?r[m.tm]:""),
+   gm:codeSafe("gm", m.gm>=0?r[m.gm]:""),
+   gc:codeSafe("gc", m.gc>=0?r[m.gc]:""),
+   gci:codeSafe("gci", m.gci>=0?r[m.gci]:""),
+   sa:codeSafe("setor", m.sa>=0?r[m.sa]:""),
+   cod:((m.cod>=0?r[m.cod]:"")||"").toString().trim()});
+ });
+ if(!recs.length) return toast("nenhuma descricao reconhecida no arquivo");
+ const sujas = data.filter(function(r){
+  const g=(m.gm>=0?String(r[m.gm]||""):""), t=(m.tm>=0?String(r[m.tm]||""):"");
+  return (g && g.trim()!==codeOf("gm",g)) || (t && t.trim().toUpperCase()!==codeOf("tm",t));
+ }).length;
+ S.base = append? S.base.concat(recs) : recs;
+ buildIndex(); await saveBase(); setBaseState();
+ S.log.push({t:Date.now(),d:f.name,tm:"",gm:"",gc:"",conf:"",src:"Augusto",ev:(append?"base acrescentada: ":"base substituida: ")+recs.length+" registros"});
+ saveLog(); renderLog();
+ toast(recs.length.toLocaleString("pt-BR")+" materiais carregados e persistidos"+(sujas?" | "+sujas+" linha(s) vinham com codigo+descricao e foram reduzidas ao codigo":""));
+}
+
+/* ================= LOG / REGRAS ================= */
+function renderLog(){
+ const tb=$("#logTb tbody"); const l=S.log.slice(-400).reverse();
+ tb.innerHTML=l.map(function(x){
+  return "<tr><td class=\"mono\">"+new Date(x.t).toLocaleString("pt-BR")+"</td><td>"+esc(x.d)+"</td><td class=\"code\">"+esc(x.tm||"")+"</td><td class=\"code\">"+esc(x.gm||"")+"</td><td class=\"code\">"+esc(x.gc||"")+"</td><td>"+esc(x.conf===""?"":x.conf+"%")+"</td><td>"+esc(x.src)+"</td><td>"+esc(x.ev)+"</td></tr>";
+ }).join("");
+}
+function renderRegras(){
+ $("#tbTipos tbody").innerHTML=TIPOS.map(function(t){return "<tr><td class=\"code\">"+t[0]+"</td><td>"+t[1]+"</td><td>"+t[2]+"</td></tr>"}).join("");
+ $("#tbGm tbody").innerHTML=Object.keys(GM).map(function(k){return "<tr><td class=\"code\">"+k+"</td><td>"+esc(GM[k])+(GM_IMOB.indexOf(k)>=0?" <span class=\"tag wa\">304</span>":"")+"</td></tr>"}).join("");
+ $("#tbGc tbody").innerHTML=Object.keys(GC).map(function(k){return "<tr><td class=\"code\">"+k+"</td><td>"+esc(GC[k])+"</td></tr>"}).join("");
+ $("#regraImob").innerHTML =
+  "<label>Tres requisitos cumulativos</label><ul>"+IMOB.criterios.map(function(c){return "<li>"+esc(c)+"</li>"}).join("")+"</ul>"+
+  "<label>Excecoes sempre imobilizado, independente do valor</label><div>"+IMOB.excecoes.map(function(e){return "<span class=\"tag wa\" style=\"margin:2px\">"+esc(e)+"</span>"}).join("")+"</div>"+
+  "<label>Substantivos de bem duravel monitorados</label><div class=\"mono\" style=\"color:#68748a\">"+esc(IMOB.bens.join(", "))+"</div>"+
+  "<div class=\"note\" style=\"margin-top:12px\">Quando a descricao traz um termo de peca ou componente (parafuso, filtro, kit, reparo...), o alerta nao dispara: trata-se de material de reposicao do Fluxo 302.</div>";
+}
+
+/* ================= EVENTOS ================= */
+$$("nav button").forEach(function(b){
+ b.onclick=function(){
+  $$("nav button").forEach(function(x){x.classList.remove("on")}); b.classList.add("on");
+  $$("main > section").forEach(function(s){s.classList.add("hidden")});
+  $("#t-"+b.dataset.t).classList.remove("hidden");
+ };
+});
+function runUnico(){
+ const d=$("#u1").value.trim(); if(!d) return toast("digite o nome do material");
+ S.results=[classify(d,$("#u2").value.trim(),$("#u3").value.trim())];
+ renderOut(); logResults("analise unitaria");
+ $("#stepRes").scrollIntoView({behavior:"smooth",block:"start"});
+}
+$("#bUnico").onclick=runUnico;
+$("#u1").onkeydown=function(e){ if(e.key==="Enter") runUnico() };
+$("#bExemplo").onclick=function(){
+ $("#u1").value="ROLAMENTO AUT RL 22210E";
+ $("#u2").value="ROLAMENTO AUT RL 22210E";
+ $("#u3").value="ROLAMENTO; TIPO: AUTOCOMPENSADOR ROLO; DIMENSOES: 50X90X23MM; REFERENCIA: 22210E";
+ runUnico();
+};
+$("#bLote").onclick=function(){
+ const lines=$("#loteIn").value.split("\n").map(function(x){return x.trim()}).filter(Boolean);
+ if(!lines.length) return toast("cole ao menos um material");
+ const items=lines.map(function(l){const p=l.split(";");return {d:(p[0]||"").trim(),c:(p[1]||"").trim(),l:(p[2]||"").trim()}});
+ analyzeList(items).then(function(){ $("#stepRes").scrollIntoView({behavior:"smooth",block:"start"}) });
+};
+$("#onlyEx").onchange=renderOut;
+let upFile=null;
+$("#drop").onclick=function(){$("#file").click()};
+$("#drop").ondragover=function(e){e.preventDefault();this.classList.add("hot")};
+$("#drop").ondragleave=function(){this.classList.remove("hot")};
+$("#drop").ondrop=function(e){e.preventDefault();this.classList.remove("hot");upFile=e.dataTransfer.files[0];if(upFile){$("#dropInfo").textContent=upFile.name;$("#bUp").disabled=false}};
+$("#file").onchange=function(){upFile=this.files[0];if(upFile){$("#dropInfo").textContent=upFile.name;$("#bUp").disabled=false}};
+$("#bUp").onclick=async function(){
+ if(!upFile) return;
+ try{
+  const rows=await readAny(upFile);
+  const head=looksHeader(rows[0])?rows[0]:null;
+  const m=mapCols(head||rows[0].map(function(_,i){return "c"+i}));
+  const data=head?rows.slice(1):rows;
+  const items=data.map(function(r){return {d:((r[m.d]||"")+"").trim(), c:m.c>=0?((r[m.c]||"")+"").trim():"", l:m.l>=0?((r[m.l]||"")+"").trim():""}}).filter(function(x){return x.d||x.c});
+  if(!items.length) return toast("nenhuma coluna de descricao reconhecida na planilha");
+  toast(items.length+" materiais lidos"+(head?" (colunas reconhecidas)":""));
+  await analyzeList(items);
+  $("#stepRes").scrollIntoView({behavior:"smooth",block:"start"});
+ }catch(e){ toast("nao foi possivel ler o arquivo; salve como XLSX ou CSV e tente novamente") }
+};
+$("#bXlsModelo").onclick=function(){ if(!needResults())return; download(xlsxWrite(rows4mdg($("#skipEx").checked),"Etapa 5 - Central de Cadastro"),"cadastro-massa-4mdg-"+Date.now()+".xlsx") };
+$("#bCsvModelo").onclick=function(){ if(!needResults())return; dlCsv(rows4mdg($("#skipEx").checked),"cadastro-massa-4mdg-"+Date.now()+".csv") };
+$("#bXlsFull").onclick=function(){ if(!needResults())return; download(xlsxWrite(rowsFull(),"Analise 302"),"analise-302-"+Date.now()+".xlsx") };
+$("#bCopy").onclick=function(){ copyTsv(true) };
+$("#skipEx").onchange=buildTsv;
+$("#bAudit").onclick=function(){
+ if(!needResults()) return;
+ const a=auditExport($("#skipEx").checked);
+ if(!a.bad.length) $("#auditOut").innerHTML="<div class=\"note ok\" style=\"margin-top:10px\"><b>Exportacao conferida:</b> "+a.total+" linha(s), todas as colunas de classificacao com codigo puro (Tipo, Grupo de Mercadoria, Grupo de Compradores, Grupo Categoria Item, Setor de Atividade e Cadastro aprovado?). Nenhuma descricao nas celulas.</div>";
+ else $("#auditOut").innerHTML="<div class=\"note ri\" style=\"margin-top:10px\"><b>"+a.bad.length+" celula(s) fora do padrao de codigo:</b> "+a.bad.slice(0,12).map(function(b){return "linha "+b.linha+" - "+b.campo+" = "+esc(b.valor)}).join(" ; ")+"</div>";
+};
+$("#bBaseFile").onclick=function(){$("#baseFile").click()};
+$("#baseFile").onchange=async function(){ const f=this.files[0]; if(!f) return; $("#baseFileInfo").textContent=f.name;
+ try{ await loadBaseFile(f,$("#baseAppend").checked) }catch(e){ toast("falha ao ler a base; verifique se e XLSX ou CSV") } };
+$("#bAdm").onclick=function(){
+ if($("#admPwd").value!==S.pwd) return toast("senha incorreta");
+ $("#admLock").classList.add("hidden"); $("#admArea").classList.remove("hidden");
+ $("#admInfo").textContent="Base: "+S.base.length+" registros | termos aprendidos: "+S.lexBase.size+" | substantivos aprendidos: "+S.headBase.size+" | correcoes: "+S.fb.length+" | log: "+S.log.length+" eventos.";
+};
+$("#bRelearn").onclick=function(){ buildIndex(); setBaseState(); toast("aprendizado reconstruido a partir da base") };
+$("#bExpBase").onclick=function(){ dlCsv([["descricao_material","descricao_curta","descricao_longa","tipo_material","grupo_mercadorias","grupo_compradores","grupo_categoria_item","setor_atividade","codigo"]].concat(S.base.map(function(r){return [r.d,r.c,r.l,r.tm,r.gm,r.gc,r.gci,r.sa,r.cod]})),"base-302.csv") };
+$("#bExpFb").onclick=function(){ dlCsv([["descricao","tipo","grupo_mercadorias","grupo_compradores","quando"]].concat(S.fb.map(function(f){return [f.d,f.tm,f.gm,f.gc,new Date(f.t).toLocaleString("pt-BR")]})),"correcoes.csv") };
+$("#bClrBase").onclick=async function(){ if(!confirm("Limpar a base carregada? Suas correcoes e o log serao mantidos.")) return; S.base=[]; buildIndex(); await saveBase(); setBaseState(); toast("base limpa") };
+$("#bChgPwd").onclick=async function(){ const p=prompt("Nova senha do administrador:"); if(!p) return; S.pwd=p; await kvSet("pwd",p); toast("senha atualizada") };
+$("#bExpLog").onclick=function(){ dlCsv([["quando","descricao","tipo","gm","gc","confianca","origem","evento"]].concat(S.log.map(function(x){return [new Date(x.t).toLocaleString("pt-BR"),x.d,x.tm,x.gm,x.gc,x.conf,x.src,x.ev]})),"log-decisoes.csv") };
+$("#bClrLog").onclick=async function(){ if(!confirm("Limpar o log de decisoes?")) return; S.log=[]; await saveLog(); renderLog(); toast("log limpo") };
+
+/* ================= INIT ================= */
+(async function(){
+ renderRegras();
+ try{
+  const b=await kvGet("base"); if(b&&b.length) S.base=b;
+  const f=await kvGet("fb"); if(f) S.fb=f;
+  const l=await kvGet("log"); if(l) S.log=l;
+  const p=await kvGet("pwd"); if(p) S.pwd=p;
+ }catch(e){}
+ buildIndex(); setBaseState(); renderLog(); renderOut();
+ if(!S.base.length) toast("pronto para uso; carregue a base em Base e administracao para ativar a duplicidade");
+})();
+</script>
+</body>
+</html>
